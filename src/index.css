@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", sans-serif;
+}
+
+@layer base {
+  :root {
+    --accent-yellow: #f7c71c;
+    --accent-yellow-deep: #f2a900;
+    --accent-glow: rgba(247, 199, 28, 0.35);
+  }
+
+  body {
+    @apply bg-[#050505] text-white font-sans antialiased;
+  }
+}
+
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.glass-dark {
+  @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-yellow-400 to-emerald-400;
+}
+
+.yellow-glow {
+  box-shadow: 0 0 45px var(--accent-glow);
+}
