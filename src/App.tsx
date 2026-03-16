@@ -25,6 +25,49 @@ import {
 import { cn } from './lib/utils';
 import { APPS, AppData } from './data';
 
+// Composant d'image optimisé
+const OptimizedImage = ({ 
+  src, 
+  alt, 
+  className, 
+  loading = 'lazy',
+  priority = false 
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  loading?: 'lazy' | 'eager';
+  priority?: boolean;
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div className={cn("relative overflow-hidden", className)}>
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-white/5 animate-pulse" />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={cn(
+          "w-full h-full object-cover transition-opacity duration-300",
+          isLoaded ? "opacity-100" : "opacity-0"
+        )}
+        loading={priority ? 'eager' : loading}
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+      />
+      {hasError && (
+        <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
+          <div className="text-white/40 text-xs">Image non disponible</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CATEGORIES = [
   { name: 'All', icon: LayoutGrid },
   { name: 'Social', icon: Globe },
@@ -58,7 +101,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 1600);
+    const timer = setTimeout(() => setShowSplash(false), 1200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -72,38 +115,53 @@ export default function App() {
   }, [searchQuery, selectedCategory]);
 
   const handleDownload = async (app: AppData) => {
-      setInstallStatus('scanning');
-      setInstallProgress(0);
+    // Détection automatique de la plateforme et redirection directe pour iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
+    if (isIOS && app.iosUrl) {
+      // Redirection directe vers PWA pour iOS
+      window.open(app.iosUrl, '_blank');
+      return;
+    }
 
-      // Simulate Security Scan
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    // Pour Android et autres plateformes
+    setInstallStatus('scanning');
+    setInstallProgress(0);
 
-      setInstallStatus('downloading');
-      // Simulate Download Progress
-      for (let i = 0; i <= 100; i += 20) {
-        setInstallProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 100));
+    // Simulate Security Scan
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    setInstallStatus('downloading');
+    // Simulate Download Progress
+    for (let i = 0; i <= 100; i += 25) {
+      setInstallProgress(i);
+      await new Promise(resolve => setTimeout(resolve, 80));
+    }
+
+    setInstallStatus('completed');
+
+    // Force download after simulation
+    setTimeout(() => {
+      let downloadUrl = '';
+
+      if (platform === 'android' && app.androidUrl) {
+        downloadUrl = app.androidUrl;
+      } else if (platform === 'ios' && app.iosUrl) {
+        downloadUrl = app.iosUrl;
+      } else if (app.pwaUrl) {
+        downloadUrl = app.pwaUrl;
+      } else {
+        downloadUrl = app.androidUrl || app.iosUrl || '';
       }
 
-      setInstallStatus('completed');
-
-      // Force download after simulation
-      setTimeout(() => {
-        let downloadUrl = '';
-
-        if (platform === 'android' && app.androidUrl) {
-          downloadUrl = app.androidUrl;
-        } else if (platform === 'ios' && app.iosUrl) {
-          downloadUrl = app.iosUrl;
-        } else if (app.pwaUrl) {
-          downloadUrl = app.pwaUrl;
-        } else {
-          downloadUrl = app.androidUrl || app.iosUrl || '';
-        }
-
-        if (downloadUrl) {
-          try {
-            // Force download using fetch and blob
+      if (downloadUrl) {
+        try {
+          // Pour les liens Play Store, ouvrir directement
+          if (downloadUrl.includes('play.google.com')) {
+            window.open(downloadUrl, '_blank');
+          } else {
+            // Force download using fetch and blob pour les APK locaux
             fetch(downloadUrl)
               .then(response => response.blob())
               .then(blob => {
@@ -126,16 +184,17 @@ export default function App() {
                 link.click();
                 document.body.removeChild(link);
               });
-          } catch (error) {
-            console.error('Download error:', error);
-            // Final fallback
-            window.open(downloadUrl, '_blank');
           }
+        } catch (error) {
+          console.error('Download error:', error);
+          // Final fallback
+          window.open(downloadUrl, '_blank');
         }
+      }
 
-        setInstallStatus('idle');
-      }, 800);
-    };
+      setInstallStatus('idle');
+    }, 600);
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
@@ -235,10 +294,11 @@ export default function App() {
         {searchQuery === '' && selectedCategory === 'All' && (
           <section className="mb-12">
             <div className="relative h-[300px] sm:h-[400px] rounded-[32px] overflow-hidden group">
-              <img 
-                src="/medium-shot-man-posing-futuristic-portrait.jpg" 
-                alt="Featured" 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              <OptimizedImage
+                src="/medium-shot-man-posing-futuristic-portrait.jpg"
+                alt="Featured"
+                className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+                priority={true}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8 sm:p-12">
@@ -334,7 +394,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 app-grid">
             <AnimatePresence mode="popLayout">
               {filteredApps.map((app) => (
                 <motion.div
@@ -348,7 +408,11 @@ export default function App() {
                 >
                   <div className="flex gap-4 mb-4">
                     <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl group-hover:scale-105 transition-transform">
-                      <img src={app.icon} alt={app.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <OptimizedImage
+                        src={app.icon}
+                        alt={app.name}
+                        className="w-full h-full"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-lg truncate group-hover:text-blue-400 transition-colors">{app.name}</h4>
@@ -409,7 +473,12 @@ export default function App() {
               <div className="overflow-y-auto p-8 sm:p-12">
                 <div className="flex flex-col md:flex-row gap-8 mb-12">
                   <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[32px] overflow-hidden shadow-2xl flex-shrink-0">
-                    <img src={selectedApp.icon} alt={selectedApp.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <OptimizedImage
+                      src={selectedApp.icon}
+                      alt={selectedApp.name}
+                      className="w-full h-full"
+                      priority={true}
+                    />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -527,13 +596,13 @@ export default function App() {
                   <h4 className="text-xl font-display font-bold mb-6">Screenshots</h4>
                   <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                     {selectedApp.screenshots.map((src, i) => (
-                      <img 
-                        key={i} 
-                        src={src} 
-                        alt="Screenshot" 
-                        className="h-[400px] rounded-2xl object-cover shadow-xl"
-                        referrerPolicy="no-referrer"
-                      />
+                      <div key={i} className="h-[400px] rounded-2xl overflow-hidden shadow-xl flex-shrink-0">
+                        <OptimizedImage
+                          src={src}
+                          alt={`Screenshot ${i + 1}`}
+                          className="h-[400px] w-auto"
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>

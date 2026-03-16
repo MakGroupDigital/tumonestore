@@ -33,3 +33,53 @@
 .yellow-glow {
   box-shadow: 0 0 45px var(--accent-glow);
 }
+/* Performance optimizations */
+img {
+  content-visibility: auto;
+  contain-intrinsic-size: 300px 200px;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Preload critical images */
+.hero-image {
+  will-change: transform;
+}
+
+/* Optimize animations */
+.glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  will-change: backdrop-filter;
+}
+
+.glass-dark {
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  will-change: backdrop-filter;
+}
+
+/* Reduce layout shifts */
+.app-grid {
+  contain: layout style paint;
+}
+
+/* Optimize hover effects */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+  will-change: transform;
+}
+
+/* Optimize text rendering */
+body {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
