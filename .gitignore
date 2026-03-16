@@ -7,9 +7,8 @@ coverage/
 .env*
 !.env.example
 # Heavy files (hosted on Cloudinary)
-public/App/
 upload-*.cjs
 cloudinary-urls.json
 
-# APK files
-*.apk
+# APK files - exclude Un+ APK specifically
+public/App/Un+/un+.apk

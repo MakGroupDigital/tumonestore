@@ -72,43 +72,70 @@ export default function App() {
   }, [searchQuery, selectedCategory]);
 
   const handleDownload = async (app: AppData) => {
-    setInstallStatus('scanning');
-    setInstallProgress(0);
+      setInstallStatus('scanning');
+      setInstallProgress(0);
 
-    // Simulate Security Scan
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setInstallStatus('downloading');
-    // Simulate Download Progress
-    for (let i = 0; i <= 100; i += 10) {
-      setInstallProgress(i);
-      await new Promise(resolve => setTimeout(resolve, 150));
-    }
+      // Simulate Security Scan
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-    setInstallStatus('completed');
-    
-    // Real redirection after simulation
-    setTimeout(() => {
-      if (platform === 'ios') {
-        if (app.iosUrl) {
-          window.open(app.iosUrl, '_blank');
-        } else if (app.pwaUrl) {
-          alert('To install this app on iOS: \n1. Tap the Share button \n2. Scroll down and tap "Add to Home Screen"');
-          window.open(app.pwaUrl, '_blank');
-        }
-      } else if (platform === 'android') {
-        if (app.androidUrl) {
-          window.open(app.androidUrl, '_blank');
-        } else if (app.pwaUrl) {
-          window.open(app.pwaUrl, '_blank');
-        }
-      } else {
-        const url = app.pwaUrl || app.androidUrl || app.iosUrl;
-        if (url) window.open(url, '_blank');
+      setInstallStatus('downloading');
+      // Simulate Download Progress
+      for (let i = 0; i <= 100; i += 20) {
+        setInstallProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-      setInstallStatus('idle');
-    }, 800);
-  };
+
+      setInstallStatus('completed');
+
+      // Force download after simulation
+      setTimeout(() => {
+        let downloadUrl = '';
+
+        if (platform === 'android' && app.androidUrl) {
+          downloadUrl = app.androidUrl;
+        } else if (platform === 'ios' && app.iosUrl) {
+          downloadUrl = app.iosUrl;
+        } else if (app.pwaUrl) {
+          downloadUrl = app.pwaUrl;
+        } else {
+          downloadUrl = app.androidUrl || app.iosUrl || '';
+        }
+
+        if (downloadUrl) {
+          try {
+            // Force download using fetch and blob
+            fetch(downloadUrl)
+              .then(response => response.blob())
+              .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+              })
+              .catch(() => {
+                // Fallback: direct link
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              });
+          } catch (error) {
+            console.error('Download error:', error);
+            // Final fallback
+            window.open(downloadUrl, '_blank');
+          }
+        }
+
+        setInstallStatus('idle');
+      }, 800);
+    };
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
@@ -209,10 +236,9 @@ export default function App() {
           <section className="mb-12">
             <div className="relative h-[300px] sm:h-[400px] rounded-[32px] overflow-hidden group">
               <img 
-                src="https://picsum.photos/seed/store-hero/1920/1080" 
+                src="/medium-shot-man-posing-futuristic-portrait.jpg" 
                 alt="Featured" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8 sm:p-12">
