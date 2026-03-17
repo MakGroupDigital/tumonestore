@@ -26,6 +26,7 @@ import {
 import { cn } from './lib/utils';
 import { APPS, AppData } from './data';
 import { useAppState, LanguageCode } from './hooks/useAppState';
+import { usePersistedState } from './hooks/usePersistedState';
 
 // Composant d'image optimisé
 const OptimizedImage = ({ 
@@ -82,6 +83,147 @@ const CATEGORIES = [
   { name: 'Sports', icon: Trophy },
 ];
 
+type GuideStep = {
+  title: string;
+  detail: string;
+};
+
+type PlatformGuide = {
+  label: string;
+  title: string;
+  description: string;
+  steps: GuideStep[];
+};
+
+const BASE_DOWNLOAD_GUIDES_FR: Record<'android' | 'ios' | 'pwa', PlatformGuide> = {
+  android: {
+    label: 'Android',
+    title: 'Installer une app Tumone Verified',
+    description: 'Du “Get” au lancement, chaque action se fait dans un cadre animé type smartphone.',
+    steps: [
+      {
+        title: 'Télécharger avec Get',
+        detail: 'Appuyez sur “Get”, choisissez “Télécharger via Tumone Store” et attendez la progression.',
+      },
+      {
+        title: 'Autoriser les sources inconnues',
+        detail: 'Paramètres → Applications → Installer des sources inconnues → activez Tumone Store ou votre navigateur.',
+      },
+      {
+        title: 'Suivre la barre d’état',
+        detail: 'La progression anime le bouton jusqu’au “Installer”. Puis ouvrez l’app dès qu’elle est prête.',
+      },
+    ],
+  },
+  ios: {
+    label: 'iPhone',
+    title: 'Ajouter Tumone Store en PWA',
+    description: 'Safari affiche un mockup iPhone avec le guide pas-à-pas, prêt pour vous.',
+    steps: [
+      {
+        title: 'Ouvrir Safari',
+        detail: 'Chargez tumone store, puis laissez la page se stabiliser.',
+      },
+      {
+        title: 'Ajouter à l’écran d’accueil',
+        detail: 'Partager → Ajouter à l’écran d’accueil → valider “Tumone Store”.',
+      },
+      {
+        title: 'Lancer l’icône',
+        detail: 'Tumone se lance comme une app native, prête à streamer vos apps Tumone Verified.',
+      },
+    ],
+  },
+  pwa: {
+    label: 'Web / PWA',
+    title: 'Installer sur tout appareil',
+    description: 'Un cadre universel illustre la session en cours sur le navigateur ou le PWA.',
+    steps: [
+      {
+        title: 'Cliquer sur le menu',
+        detail: 'Plus → Ajouter à l’écran d’accueil ou “Installer l’app” selon le navigateur.',
+      },
+      {
+        title: 'Confirmer l’installation',
+        detail: 'L’animation guide l’utilisateur vers la création du raccourci dans le dock.',
+      },
+      {
+        title: 'Retourner dans Tumone',
+        detail: 'La nouvelle icône s’ajoute, prête à ouvrir chaque application Tumone Verified.',
+      },
+    ],
+  },
+};
+
+const BASE_DOWNLOAD_GUIDES_EN: typeof BASE_DOWNLOAD_GUIDES_FR = {
+  android: {
+    label: 'Android',
+    title: 'Install a Tumone Verified app',
+    description: 'The animated phone frame walks you through download, permissions, and install.',
+    steps: [
+      {
+        title: 'Tap Get',
+        detail: 'Hit “Get”, choose “Download with Tumone Store” and let the APK stream.',
+      },
+      {
+        title: 'Allow unknown sources',
+        detail: 'Settings → Apps → Install unknown apps → allow Tumone Store or your browser.',
+      },
+      {
+        title: 'Follow the progress',
+        detail: 'Progress animates until “Install” clears, then open the app instantly.',
+      },
+    ],
+  },
+  ios: {
+    label: 'iPhone',
+    title: 'Add Tumone Store as a PWA',
+    description: 'A sleek iPhone frame mirrors Safari and explains each tap.',
+    steps: [
+      {
+        title: 'Open Safari',
+        detail: 'Visit Tumone Store and wait for the immersive interface.',
+      },
+      {
+        title: 'Add to Home Screen',
+        detail: 'Share → Add to Home Screen → confirm “Tumone Store”.',
+      },
+      {
+        title: 'Launch the icon',
+        detail: 'It opens fullscreen, ready to host every verified download.',
+      },
+    ],
+  },
+  pwa: {
+    label: 'Web / PWA',
+    title: 'Install on any device',
+    description: 'This universal frame highlights the install flow for browsers and PWAs.',
+    steps: [
+      {
+        title: 'Open the menu',
+        detail: 'Hit the browser menu, then “Add to Home Screen” or “Install app”.',
+      },
+      {
+        title: 'Confirm installation',
+        detail: 'Micro-animations show you exactly where to tap.',
+      },
+      {
+        title: 'Return to Tumone',
+        detail: 'A new shortcut appears, ready to launch verified apps.',
+      },
+    ],
+  },
+};
+
+const DOWNLOAD_GUIDES: Record<LanguageCode, typeof BASE_DOWNLOAD_GUIDES_FR> = {
+  fr: BASE_DOWNLOAD_GUIDES_FR,
+  en: BASE_DOWNLOAD_GUIDES_EN,
+  tsh: BASE_DOWNLOAD_GUIDES_FR,
+  lin: BASE_DOWNLOAD_GUIDES_FR,
+  sw: BASE_DOWNLOAD_GUIDES_FR,
+};
+
+const GUIDE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 const LANGUAGE_OPTIONS: LanguageCode[] = ['fr', 'en', 'tsh', 'lin', 'sw'];
 
 const LOCALIZATION: Record<LanguageCode, {
@@ -113,6 +255,10 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'apps trouvées',
     pulseTitle: 'Radar Tumone',
     pulseDescription: 'Suivez ce qui surfe sur les régions, appareils et créateurs. Tumone Radar repère les tendances avant qu\'elles n\'explosent.',
+    downloadGuideTitle: 'Guide tactile pour télécharger',
+    downloadGuideSubtitle: 'Un flux immersif par plateforme pour installer nos apps Tumone Verified comme un pro.',
+    guideNext: 'Suivant',
+    guideRepeat: 'Recommencer',
   },
   en: {
     navTagline: 'Charging your next app wave',
@@ -128,6 +274,10 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'apps found',
     pulseTitle: 'Pulse Radar',
     pulseDescription: 'Track what is surging across regions, devices, and creators. Tumone Radar highlights momentum before it becomes mainstream.',
+    downloadGuideTitle: 'Download guide',
+    downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
+    guideNext: 'Next step',
+    guideRepeat: 'Restart',
   },
   tsh: {
     navTagline: 'Sedala wamba wa mapema ya maputulu',
@@ -143,6 +293,10 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'maputulu ebikalile',
     pulseTitle: 'Radar ya Tumone',
     pulseDescription: 'Sunga memebi ya mawa, mapatya ne bana ba kulindila. Tumone Radar yalaka makambu liboso ya kusomba.',
+    downloadGuideTitle: 'Download guide',
+    downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
+    guideNext: 'Suivant',
+    guideRepeat: 'Recommencer',
   },
   lin: {
     navTagline: 'Sangisa mawimbi na yo ya applis',
@@ -158,6 +312,10 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'applis oyo tozui',
     pulseTitle: 'Radar ya Tumone',
     pulseDescription: 'Tala oyo ezali kopusa na bitumba, bisika mpe bato ya kokelisa. Tumone Radar eyakana liboso.',
+    downloadGuideTitle: 'Download guide',
+    downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
+    guideNext: 'Suivant',
+    guideRepeat: 'Recommencer',
   },
   sw: {
     navTagline: 'Pokea wimbi lako lijalo la programu',
@@ -173,6 +331,10 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'apps zilizopatikana',
     pulseTitle: 'Redio ya Tumone',
     pulseDescription: 'Tazama kinachopanda katika maeneo, vifaa na waumbaji. Tumone Radar inaongoza kasi kabla haijaanguka.',
+    downloadGuideTitle: 'Download guide',
+    downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
+    guideNext: 'Suivant',
+    guideRepeat: 'Recommencer',
   },
 };
 
@@ -321,6 +483,8 @@ export default function App() {
     images: string[];
     currentIndex: number;
   }>({ isOpen: false, images: [], currentIndex: 0 });
+  const [guideStepIndex, setGuideStepIndex] = useState(0);
+  const [guideLastSeen, setGuideLastSeen] = usePersistedState<number | null>('tumone-guide-last-seen', null);
 
   useEffect(() => {
     const ua = navigator.userAgent.toLowerCase();
@@ -337,6 +501,32 @@ export default function App() {
     const timer = setTimeout(() => setShowSplash(false), 1200);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    setGuideStepIndex(0);
+  }, [platform, language]);
+
+  const downloadGuide = (DOWNLOAD_GUIDES[language] ?? DOWNLOAD_GUIDES.fr)[platform];
+  const guideSteps = downloadGuide.steps;
+  const currentGuideStep = guideSteps[guideStepIndex];
+  const isLastGuideStep = guideStepIndex === guideSteps.length - 1;
+  const shouldShowGuide = !guideLastSeen || Date.now() - guideLastSeen > GUIDE_TTL_MS;
+
+  useEffect(() => {
+    if (shouldShowGuide && !guideLastSeen) {
+      setGuideLastSeen(Date.now());
+    }
+  }, [shouldShowGuide, guideLastSeen, setGuideLastSeen]);
+
+  const handleGuideNext = () => {
+    setGuideStepIndex(prev => {
+      if (prev === guideSteps.length - 1) {
+        setGuideLastSeen(Date.now());
+        return 0;
+      }
+      return prev + 1;
+    });
+  };
 
   const normalizeText = (value: string) => {
     const cleaned = value.trim().toLowerCase();
@@ -591,6 +781,21 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <div className="flex sm:hidden items-center gap-2">
+              {LANGUAGE_OPTIONS.map((code) => (
+                <button
+                  key={`mobile-${code}`}
+                  onClick={() => setLanguage(code)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full text-[10px] font-semibold border ${
+                    language === code
+                      ? 'bg-white text-black border-white'
+                      : 'bg-white/5 text-white/60 border-white/20'
+                  }`}
+                >
+                  {code.toUpperCase()}
+                </button>
+              ))}
+            </div>
             <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
               <Smartphone className="w-5 h-5 text-white/60" />
             </div>
@@ -654,6 +859,51 @@ export default function App() {
               </div>
             </div>
           </section>
+        )}
+
+        {/* Téléchargement immersif */}
+        {shouldShowGuide && (
+          <section className="mb-12">
+            <div className="flex flex-col items-center text-center gap-3 max-w-3xl mx-auto">
+              <p className="text-[10px] uppercase tracking-[0.6em] text-white/40">Tumone Download</p>
+              <h3 className="text-3xl font-display font-bold">{copy.downloadGuideTitle}</h3>
+            <p className="text-white/60 text-sm sm:text-base">{copy.downloadGuideSubtitle}</p>
+          </div>
+          <div className="mt-8 flex flex-col items-center gap-6 lg:gap-10">
+            <div
+              className={`relative w-full max-w-[360px] bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl p-6 ${platform === 'ios' ? 'rounded-[80px] border-[12px] border-white/20' : platform === 'android' ? 'rounded-[45px] border-[16px] border-blue-500/40' : 'rounded-[40px] border-[14px] border-purple-500/40'}`}
+            >
+              <div className="relative z-10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs uppercase tracking-[0.4em] text-white/60">{downloadGuide.label}</span>
+                  <span className="text-[10px] uppercase tracking-[0.4em] text-white/40">
+                    {guideStepIndex + 1}/{guideSteps.length}
+                  </span>
+                </div>
+                <h4 className="text-2xl font-semibold">{downloadGuide.title}</h4>
+                <p className="text-sm text-white/70 leading-relaxed">{downloadGuide.description}</p>
+                <div className="rounded-2xl bg-white/5 p-4 border border-white/5">
+                  <p className="text-[11px] uppercase tracking-[0.4em] text-white/60">{currentGuideStep.title}</p>
+                  <p className="mt-2 text-sm text-white/80 leading-snug">{currentGuideStep.detail}</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex w-full max-w-[360px] gap-2">
+              {guideSteps.map((_, index) => (
+                <span
+                  key={index}
+                  className={`flex-1 h-1 rounded-full transition ${index <= guideStepIndex ? 'bg-[color:var(--accent-yellow)]' : 'bg-white/10'}`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={handleGuideNext}
+              className="px-6 py-2 rounded-2xl bg-white text-black font-semibold tracking-wide hover:bg-white/90 transition"
+            >
+              {isLastGuideStep ? copy.guideRepeat : copy.guideNext}
+            </button>
+          </div>
+        </section>
         )}
 
         {/* App Grid */}
