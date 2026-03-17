@@ -20,10 +20,12 @@ import {
   Info,
   ShoppingBag,
   GraduationCap,
-  Trophy
+  Trophy,
+  ChevronDown
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { APPS, AppData } from './data';
+import { useAppState, LanguageCode } from './hooks/useAppState';
 
 // Composant d'image optimisé
 const OptimizedImage = ({ 
@@ -80,14 +82,245 @@ const CATEGORIES = [
   { name: 'Sports', icon: Trophy },
 ];
 
+const LANGUAGE_OPTIONS: LanguageCode[] = ['fr', 'en', 'tsh', 'lin', 'sw'];
+
+const LOCALIZATION: Record<LanguageCode, {
+  navTagline: string;
+  searchPlaceholder: string;
+  heroBadge: string;
+  heroSecure: string;
+  heroHeadline: string;
+  heroAccent: string;
+  heroBody: string;
+  heroCta: string;
+  trendingTitle: string;
+  searchResultsTitle: string;
+  appsFoundLabel: string;
+  pulseTitle: string;
+  pulseDescription: string;
+}> = {
+  fr: {
+    navTagline: 'Chargez votre prochaine vague d\'applis',
+    searchPlaceholder: 'Rechercher apps, jeux...',
+    heroBadge: 'Choix de la rédaction',
+    heroSecure: 'Sécurisé',
+    heroHeadline: 'Vivez l\'expérience',
+    heroAccent: 'Future des Apps',
+    heroBody: 'Découvrez des applications ultra-rapides, modernes et sécurisées, sélectionnées pour votre appareil.',
+    heroCta: 'Explorer maintenant',
+    trendingTitle: 'Applications tendance',
+    searchResultsTitle: 'Résultats de recherche',
+    appsFoundLabel: 'apps trouvées',
+    pulseTitle: 'Radar Tumone',
+    pulseDescription: 'Suivez ce qui surfe sur les régions, appareils et créateurs. Tumone Radar repère les tendances avant qu\'elles n\'explosent.',
+  },
+  en: {
+    navTagline: 'Charging your next app wave',
+    searchPlaceholder: 'Search apps, games...',
+    heroBadge: 'Editor\'s Choice',
+    heroSecure: 'Secure',
+    heroHeadline: 'Experience the',
+    heroAccent: 'Future of Apps',
+    heroBody: 'Discover ultra-fast, modern, and secure applications curated just for you.',
+    heroCta: 'Explore Now',
+    trendingTitle: 'Trending Apps',
+    searchResultsTitle: 'Search Results',
+    appsFoundLabel: 'apps found',
+    pulseTitle: 'Pulse Radar',
+    pulseDescription: 'Track what is surging across regions, devices, and creators. Tumone Radar highlights momentum before it becomes mainstream.',
+  },
+  tsh: {
+    navTagline: 'Sedala wamba wa mapema ya maputulu',
+    searchPlaceholder: 'Lukula maputulu, mabunduku...',
+    heroBadge: 'Kapowa ka bampehe',
+    heroSecure: 'Bukalenge bukubeba',
+    heroHeadline: 'Landa',
+    heroAccent: 'Bumulu bwa Maputulu',
+    heroBody: 'Landa maputulu ya luatshi, ma makaba ne bukalenge bubi ku cikila lukodi wa nshinga.',
+    heroCta: 'Tala kusaka',
+    trendingTitle: 'Maputulu ma musangu',
+    searchResultsTitle: 'Mawenga ma lupupa',
+    appsFoundLabel: 'maputulu ebikalile',
+    pulseTitle: 'Radar ya Tumone',
+    pulseDescription: 'Sunga memebi ya mawa, mapatya ne bana ba kulindila. Tumone Radar yalaka makambu liboso ya kusomba.',
+  },
+  lin: {
+    navTagline: 'Sangisa mawimbi na yo ya applis',
+    searchPlaceholder: 'Tala applis, ba jeux...',
+    heroBadge: 'Liboso ya Bawuta',
+    heroSecure: 'Nzela ya kobatela',
+    heroHeadline: 'Yoka',
+    heroAccent: 'Liso ya Applis',
+    heroBody: 'Kokanisa applis ya suka, ya boboto mpe ya kofongola lifuti.',
+    heroCta: 'Tala sikoyo',
+    trendingTitle: 'Applis oyo ezali kotambola',
+    searchResultsTitle: 'Bisengeli ya kosala',
+    appsFoundLabel: 'applis oyo tozui',
+    pulseTitle: 'Radar ya Tumone',
+    pulseDescription: 'Tala oyo ezali kopusa na bitumba, bisika mpe bato ya kokelisa. Tumone Radar eyakana liboso.',
+  },
+  sw: {
+    navTagline: 'Pokea wimbi lako lijalo la programu',
+    searchPlaceholder: 'Tafuta apps, michezo...',
+    heroBadge: 'Chaguo la Wahariri',
+    heroSecure: 'Salama',
+    heroHeadline: 'Pata uzoefu',
+    heroAccent: 'Wakati wa Apps',
+    heroBody: 'Gundua programu za kasi, za kisasa na salama zilizokusanywa kwa ajili yako.',
+    heroCta: 'Chunguza sasa',
+    trendingTitle: 'Programu zinazovuma',
+    searchResultsTitle: 'Matokeo ya utafutaji',
+    appsFoundLabel: 'apps zilizopatikana',
+    pulseTitle: 'Redio ya Tumone',
+    pulseDescription: 'Tazama kinachopanda katika maeneo, vifaa na waumbaji. Tumone Radar inaongoza kasi kabla haijaanguka.',
+  },
+};
+
+const INNOVATION_CARDS: Record<LanguageCode, { title: string; desc: string; badge: string }[]> = {
+  fr: [
+    {
+      title: 'Collections intelligentes',
+      desc: 'Des sélections pilotées par l\'IA en fonction de votre usage réel. Pas de bruit, que de la vitesse.',
+      badge: 'Nouveau',
+    },
+    {
+      title: 'Restauration instantanée',
+      desc: 'Récupération en un clic de vos apps essentielles. Changez de device sans perdre vos workflows.',
+      badge: 'Nuage',
+    },
+    {
+      title: 'Ateliers Créateurs',
+      desc: 'Une rampe pour les créateurs émergents avec builds vérifiés et changelogs transparents.',
+      badge: 'Mis en avant',
+    },
+  ],
+  en: [
+    {
+      title: 'Smart Collections',
+      desc: 'AI-curated drops based on how you actually use your device. No noise, just velocity.',
+      badge: 'New',
+    },
+    {
+      title: 'Instant Restore',
+      desc: 'One-tap recovery for your essential stack. Switch devices and keep every workflow intact.',
+      badge: 'Cloud',
+    },
+    {
+      title: 'Creator Labs',
+      desc: 'A spotlight lane for rising creators, powered by verified builds and transparent changelogs.',
+      badge: 'Featured',
+    },
+  ],
+  tsh: [
+    {
+      title: 'Bimuntu vya Malipuka',
+      desc: 'Mapembele ya AI mu lifwa lya bakumba. Budi badinga, bulemboka.',
+      badge: 'Sika',
+    },
+    {
+      title: 'Kusosa kusanga',
+      desc: 'Bukeba mu kukula ku diabu dya yo. Shala tshilema mu kusosa disangu.',
+      badge: 'Luse',
+    },
+    {
+      title: 'Batongolaji ba Bakanyi',
+      desc: 'Mutoki wa ba creatéurs balesa ne changelog zyashala mu lisolo lavi.',
+      badge: 'Bangi',
+    },
+  ],
+  lin: [
+    {
+      title: 'Makoki ya Smart',
+      desc: 'Ba sélections ya AI, ebimisami na ndenge otindi yo. Kozanga libanga, kaka malongo.',
+      badge: 'Sika',
+    },
+    {
+      title: 'Kokotisa Mbala',
+      desc: 'Kozonga ya mbala moko na stack na yo. Warisa appareil mpe kokoba mosala.',
+      badge: 'Lola',
+    },
+    {
+      title: 'Ateliers ya Createurs',
+      desc: 'Nzela mpo na base ya batu bafandaka, na builds ya solo mpe changelog ya transparence.',
+      badge: 'Misala',
+    },
+  ],
+  sw: [
+    {
+      title: 'Mikusanyiko Mahiri',
+      desc: 'Mikusanyiko ya AI kulingana na jinsi unavyotumia kifaa chako. Hakuna kelele, kuna kasi.',
+      badge: 'Mpya',
+    },
+    {
+      title: 'Rejesho ya Haraka',
+      desc: 'Uhuishaji wa apps muhimu mara moja. Badilisha kifaa bila kupoteza mtiririko.',
+      badge: 'Wingu',
+    },
+    {
+      title: 'Maabara za Waumbaji',
+      desc: 'Mwanga kwa waumbaji wanaochipukia, kwa kuzingatia builds zilizo hakikishiwa na changelog wazi.',
+      badge: 'Maarufu',
+    },
+  ],
+};
+
+const PULSE_STATS: Record<LanguageCode, { label: string; value: string; tone: string }[]> = {
+  fr: [
+    { label: 'Vélocité', value: '92%', tone: 'text-emerald-300' },
+    { label: 'Indice de confiance', value: 'A+', tone: 'text-[color:var(--accent-yellow)]' },
+    { label: 'Latence', value: '18ms', tone: 'text-blue-300' },
+    { label: 'Nouveautés', value: '128', tone: 'text-purple-300' },
+  ],
+  en: [
+    { label: 'Velocity', value: '92%', tone: 'text-emerald-300' },
+    { label: 'Trust Score', value: 'A+', tone: 'text-[color:var(--accent-yellow)]' },
+    { label: 'Latency', value: '18ms', tone: 'text-blue-300' },
+    { label: 'Fresh Drops', value: '128', tone: 'text-purple-300' },
+  ],
+  tsh: [
+    { label: 'Mwendu', value: '92%', tone: 'text-emerald-300' },
+    { label: 'Kamfumu', value: 'A+', tone: 'text-[color:var(--accent-yellow)]' },
+    { label: 'Buamba', value: '18ms', tone: 'text-blue-300' },
+    { label: 'Mabunduku', value: '128', tone: 'text-purple-300' },
+  ],
+  lin: [
+    { label: 'Mbangu', value: '92%', tone: 'text-emerald-300' },
+    { label: 'Bundu ya sempala', value: 'A+', tone: 'text-[color:var(--accent-yellow)]' },
+    { label: 'Ndenge ya kosala', value: '18ms', tone: 'text-blue-300' },
+    { label: 'Sango sika', value: '128', tone: 'text-purple-300' },
+  ],
+  sw: [
+    { label: 'Mwendo', value: '92%', tone: 'text-emerald-300' },
+    { label: 'Alama ya Uaminifu', value: 'A+', tone: 'text-[color:var(--accent-yellow)]' },
+    { label: 'Ucheleweshaji', value: '18ms', tone: 'text-blue-300' },
+    { label: 'Mabusha', value: '128', tone: 'text-purple-300' },
+  ],
+};
+
 export default function App() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const {
+    language,
+    setLanguage,
+    selectedCategory,
+    setSelectedCategory,
+    searchQuery,
+    setSearchQuery
+  } = useAppState();
+  const copy = LOCALIZATION[language] ?? LOCALIZATION.fr;
+  const innovationCards = INNOVATION_CARDS[language] ?? INNOVATION_CARDS.fr;
+  const pulseStats = PULSE_STATS[language] ?? PULSE_STATS.fr;
+  
   const [selectedApp, setSelectedApp] = useState<AppData | null>(null);
   const [platform, setPlatform] = useState<'ios' | 'android' | 'pwa'>('pwa');
   const [installStatus, setInstallStatus] = useState<'idle' | 'scanning' | 'downloading' | 'completed'>('idle');
   const [installProgress, setInstallProgress] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
+  const [downloadingApps, setDownloadingApps] = useState<Set<string>>(new Set());
+  const [screenshotGallery, setScreenshotGallery] = useState<{
+    isOpen: boolean;
+    images: string[];
+    currentIndex: number;
+  }>({ isOpen: false, images: [], currentIndex: 0 });
 
   useEffect(() => {
     const ua = navigator.userAgent.toLowerCase();
@@ -105,16 +338,51 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  const normalizeText = (value: string) => {
+    const cleaned = value.trim().toLowerCase();
+    try {
+      return cleaned.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    } catch {
+      return cleaned;
+    }
+  };
+
   const filteredApps = useMemo(() => {
+    const normalizedSearch = normalizeText(searchQuery);
     return APPS.filter(app => {
-      const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          app.developer.toLowerCase().includes(searchQuery.toLowerCase());
+      const searchable = [
+        app.name,
+        app.developer,
+        app.category,
+        app.description,
+      ].map(normalizeText);
+
+      const matchesSearch = normalizedSearch === '' ||
+        searchable.some(field => field.includes(normalizedSearch));
+
       const matchesCategory = selectedCategory === 'All' || app.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory]);
 
-  const handleDownload = async (app: AppData) => {
+  const openScreenshotGallery = (images: string[], index: number) => {
+    setScreenshotGallery({ isOpen: true, images, currentIndex: index });
+  };
+
+  const closeScreenshotGallery = () => {
+    setScreenshotGallery({ isOpen: false, images: [], currentIndex: 0 });
+  };
+
+  const navigateScreenshot = (direction: 'prev' | 'next') => {
+    setScreenshotGallery(prev => ({
+      ...prev,
+      currentIndex: direction === 'next' 
+        ? (prev.currentIndex + 1) % prev.images.length
+        : (prev.currentIndex - 1 + prev.images.length) % prev.images.length
+    }));
+  };
+
+  const handleModalDownload = async (app: AppData) => {
     // Détection automatique de la plateforme et redirection directe pour iOS
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -141,7 +409,7 @@ export default function App() {
 
     setInstallStatus('completed');
 
-    // Force download after simulation
+    // Téléchargement après simulation
     setTimeout(() => {
       let downloadUrl = '';
 
@@ -161,39 +429,84 @@ export default function App() {
           if (downloadUrl.includes('play.google.com')) {
             window.open(downloadUrl, '_blank');
           } else {
-            // Force download using fetch and blob pour les APK locaux
-            fetch(downloadUrl)
-              .then(response => response.blob())
-              .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
-              })
-              .catch(() => {
-                // Fallback: direct link
-                const link = document.createElement('a');
-                link.href = downloadUrl;
-                link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
-                link.target = '_blank';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              });
+            // Téléchargement direct pour les APK
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
           }
         } catch (error) {
           console.error('Download error:', error);
-          // Final fallback
           window.open(downloadUrl, '_blank');
         }
       }
 
       setInstallStatus('idle');
     }, 600);
+  };
+
+  const handleDownload = async (app: AppData) => {
+    // Détection automatique de la plateforme et redirection directe pour iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
+    if (isIOS && app.iosUrl) {
+      // Redirection directe vers PWA pour iOS
+      window.open(app.iosUrl, '_blank');
+      return;
+    }
+
+    // Ajouter l'app à la liste des téléchargements en cours
+    setDownloadingApps(prev => new Set(prev).add(app.id));
+
+    try {
+      // Simulation du délai de traitement
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Pour Android et autres plateformes
+      let downloadUrl = '';
+
+      if (platform === 'android' && app.androidUrl) {
+        downloadUrl = app.androidUrl;
+      } else if (platform === 'ios' && app.iosUrl) {
+        downloadUrl = app.iosUrl;
+      } else if (app.pwaUrl) {
+        downloadUrl = app.pwaUrl;
+      } else {
+        downloadUrl = app.androidUrl || app.iosUrl || '';
+      }
+
+      if (downloadUrl) {
+        try {
+          // Pour les liens Play Store, ouvrir directement
+          if (downloadUrl.includes('play.google.com')) {
+            window.open(downloadUrl, '_blank');
+          } else {
+            // Téléchargement direct pour les APK
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        } catch (error) {
+          console.error('Download error:', error);
+          window.open(downloadUrl, '_blank');
+        }
+      }
+    } finally {
+      // Retirer l'app de la liste des téléchargements en cours
+      setDownloadingApps(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(app.id);
+        return newSet;
+      });
+    }
   };
 
   return (
@@ -228,7 +541,7 @@ export default function App() {
                 transition={{ delay: 0.2 }}
               >
                 <p className="font-display text-2xl">Tumone Store</p>
-                <p className="text-white/50 text-sm">Charging your next app wave</p>
+                <p className="text-white/50 text-sm">{copy.navTagline}</p>
               </motion.div>
             </div>
           </motion.div>
@@ -251,7 +564,7 @@ export default function App() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
             <input
               type="text"
-              placeholder="Search apps, games..."
+              placeholder={copy.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
@@ -262,6 +575,21 @@ export default function App() {
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[color:var(--accent-yellow)]/10 border border-[color:var(--accent-yellow)]/20 text-[color:var(--accent-yellow)] text-xs font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
               Tumone Verified
+            </div>
+            <div className="hidden sm:flex items-center gap-2">
+              {LANGUAGE_OPTIONS.map((code) => (
+                <button
+                  key={code}
+                  onClick={() => setLanguage(code)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                    language === code
+                      ? 'bg-white text-black'
+                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                  }`}
+                >
+                  {code.toUpperCase()}
+                </button>
+              ))}
             </div>
             <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
               <Smartphone className="w-5 h-5 text-white/60" />
@@ -292,105 +620,51 @@ export default function App() {
 
         {/* Hero Section */}
         {searchQuery === '' && selectedCategory === 'All' && (
-          <section className="mb-12">
-            <div className="relative h-[300px] sm:h-[400px] rounded-[32px] overflow-hidden group">
-              <OptimizedImage
+          <section className="mb-8 sm:mb-12">
+            <div className="relative h-[250px] sm:h-[350px] lg:h-[400px] rounded-[20px] sm:rounded-[32px] overflow-hidden group">
+              <img
                 src="/medium-shot-man-posing-futuristic-portrait.jpg"
                 alt="Featured"
-                className="w-full h-full transition-transform duration-700 group-hover:scale-105"
-                priority={true}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-8 sm:p-12">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 rounded-full bg-[color:var(--accent-yellow)] text-black text-[10px] font-bold uppercase tracking-wider">Editor's Choice</span>
-                  <div className="flex items-center gap-1 text-[color:var(--accent-yellow)] text-xs font-medium">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    Secure
+              <div className="absolute bottom-0 left-0 p-4 sm:p-6 lg:p-8 xl:p-12 w-full">
+                <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4">
+                  <span className="px-2 sm:px-3 py-1 rounded-full bg-[color:var(--accent-yellow)] text-black text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
+                    {copy.heroBadge}
+                  </span>
+                  <div className="flex items-center gap-1 text-[color:var(--accent-yellow)] text-[10px] sm:text-xs font-medium">
+                    <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    {copy.heroSecure}
                   </div>
                 </div>
-                <h2 className="text-4xl sm:text-6xl font-display font-bold mb-4 leading-tight">
-                  Experience the <br /> <span className="gradient-text">Future of Apps</span>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-6xl font-display font-bold mb-2 sm:mb-4 leading-tight">
+                  {copy.heroHeadline} <br className="hidden sm:block" />
+                  <span className="gradient-text">{copy.heroAccent}</span>
                 </h2>
-                <p className="text-white/60 max-w-md mb-8 text-sm sm:text-base">
-                  Discover ultra-fast, modern, and secure applications curated just for you. Optimized for your device.
+                <p className="text-white/60 max-w-xs sm:max-w-md mb-4 sm:mb-8 text-xs sm:text-sm lg:text-base leading-relaxed">
+                  {copy.heroBody}
                 </p>
-                <button className="px-8 py-4 bg-[color:var(--accent-yellow)] text-black rounded-2xl font-bold hover:bg-[color:var(--accent-yellow-deep)] transition-colors flex items-center gap-2">
-                  Explore Now
-                  <ChevronRight className="w-5 h-5" />
+                <button className="px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 bg-[color:var(--accent-yellow)] text-black rounded-xl sm:rounded-2xl font-bold hover:bg-[color:var(--accent-yellow-deep)] transition-colors flex items-center gap-2 text-sm sm:text-base">
+                  {copy.heroCta}
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
           </section>
         )}
 
-        {/* Innovation Sections */}
-        <section className="mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'Smart Collections',
-                desc: 'AI-curated drops based on how you actually use your device. No noise, just velocity.',
-                badge: 'New',
-              },
-              {
-                title: 'Instant Restore',
-                desc: 'One-tap recovery for your essential stack. Switch devices and keep every workflow intact.',
-                badge: 'Cloud',
-              },
-              {
-                title: 'Creator Labs',
-                desc: 'A spotlight lane for rising creators, powered by verified builds and transparent changelogs.',
-                badge: 'Featured',
-              },
-            ].map((card) => (
-              <div key={card.title} className="glass rounded-[28px] p-6 border border-white/10">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs uppercase tracking-widest text-white/50">{card.title}</span>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-[color:var(--accent-yellow)] text-black">
-                    {card.badge}
-                  </span>
-                </div>
-                <p className="text-white/60 text-sm leading-relaxed">{card.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <div className="glass rounded-[32px] p-8 flex flex-col lg:flex-row items-start lg:items-center gap-8">
-            <div className="flex-1">
-              <h3 className="text-2xl font-display font-bold mb-3">Pulse Radar</h3>
-              <p className="text-white/60 text-sm leading-relaxed">
-                Track what is surging across regions, devices, and creators. Tumone Radar highlights momentum
-                before it becomes mainstream.
-              </p>
-            </div>
-            <div className="flex-1 grid grid-cols-2 gap-4">
-              {[
-                { label: 'Velocity', value: '92%', tone: 'text-emerald-300' },
-                { label: 'Trust Score', value: 'A+', tone: 'text-[color:var(--accent-yellow)]' },
-                { label: 'Latency', value: '18ms', tone: 'text-blue-300' },
-                { label: 'Fresh Drops', value: '128', tone: 'text-purple-300' },
-              ].map((stat) => (
-                <div key={stat.label} className="rounded-2xl bg-white/5 border border-white/10 p-4">
-                  <p className="text-white/40 text-[10px] uppercase tracking-widest">{stat.label}</p>
-                  <p className={`text-lg font-bold ${stat.tone}`}>{stat.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* App Grid */}
-        <section>
+        <section className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-2xl font-display font-bold flex items-center gap-2">
               <TrendingUp className="w-6 h-6 text-blue-400" />
-              {searchQuery ? 'Search Results' : 'Trending Apps'}
+              {searchQuery ? copy.searchResultsTitle : copy.trendingTitle}
             </h3>
             <div className="text-white/40 text-sm">
-              {filteredApps.length} apps found
+              {filteredApps.length} {copy.appsFoundLabel}
             </div>
           </div>
 
@@ -433,15 +707,67 @@ export default function App() {
                         e.stopPropagation();
                         handleDownload(app);
                       }}
-                      className="px-4 py-2 bg-white/10 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
+                      disabled={downloadingApps.has(app.id)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 min-w-[60px] justify-center ${
+                        downloadingApps.has(app.id)
+                          ? "bg-blue-600/20 text-blue-400 cursor-not-allowed"
+                          : "bg-white/10 hover:bg-blue-600 hover:text-white"
+                      }`}
                     >
-                      <Download className="w-3.5 h-3.5" />
-                      Get
+                      {downloadingApps.has(app.id) ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                          className="w-3.5 h-3.5"
+                        >
+                          <Download className="w-full h-full" />
+                        </motion.div>
+                      ) : (
+                        <>
+                          <Download className="w-3.5 h-3.5" />
+                          Get
+                        </>
+                      )}
                     </button>
                   </div>
                 </motion.div>
               ))}
             </AnimatePresence>
+          </div>
+        </section>
+        {/* Innovation Sections */}
+        <section className="mt-16 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {innovationCards.map((card) => (
+              <div key={card.title} className="glass rounded-[28px] p-6 border border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs uppercase tracking-widest text-white/50">{card.title}</span>
+                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-[color:var(--accent-yellow)] text-black">
+                    {card.badge}
+                  </span>
+                </div>
+                <p className="text-white/60 text-sm leading-relaxed">{card.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <div className="glass rounded-[32px] p-8 flex flex-col lg:flex-row items-start lg:items-center gap-8">
+            <div className="flex-1">
+              <h3 className="text-2xl font-display font-bold mb-3">{copy.pulseTitle}</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                {copy.pulseDescription}
+              </p>
+            </div>
+            <div className="flex-1 grid grid-cols-2 gap-4">
+              {pulseStats.map((stat) => (
+                <div key={stat.label} className="rounded-2xl bg-white/5 border border-white/10 p-4">
+                  <p className="text-white/40 text-[10px] uppercase tracking-widest">{stat.label}</p>
+                  <p className={`text-lg font-bold ${stat.tone}`}>{stat.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
@@ -509,7 +835,7 @@ export default function App() {
                     <div className="flex flex-wrap gap-4">
                       <button 
                         disabled={installStatus !== 'idle'}
-                        onClick={() => handleDownload(selectedApp)}
+                        onClick={() => handleModalDownload(selectedApp)}
                         className={cn(
                           "flex-1 min-w-[200px] py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 shadow-xl",
                           installStatus === 'idle' 
@@ -563,6 +889,28 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Screenshots */}
+                <div className="mb-12">
+                  <h4 className="text-xl font-display font-bold mb-6">Screenshots</h4>
+                  <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar">
+                    {selectedApp.screenshots.map((src, i) => (
+                      <div 
+                        key={i} 
+                        className="h-[300px] sm:h-[350px] lg:h-[400px] w-[180px] sm:w-[200px] lg:w-[220px] rounded-xl sm:rounded-2xl overflow-hidden shadow-xl flex-shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                        onClick={() => openScreenshotGallery(selectedApp.screenshots, i)}
+                      >
+                        <img
+                          src={src}
+                          alt={`Screenshot ${i + 1}`}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Play Protect Banner */}
                 <div className="mb-8 p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col gap-6">
                   <div className="flex items-center gap-4">
@@ -591,30 +939,134 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Screenshots */}
-                <div className="mb-12">
-                  <h4 className="text-xl font-display font-bold mb-6">Screenshots</h4>
-                  <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-                    {selectedApp.screenshots.map((src, i) => (
-                      <div key={i} className="h-[400px] rounded-2xl overflow-hidden shadow-xl flex-shrink-0">
-                        <OptimizedImage
-                          src={src}
-                          alt={`Screenshot ${i + 1}`}
-                          className="h-[400px] w-auto"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Description */}
-                <div>
+                <div className="mb-12">
                   <h4 className="text-xl font-display font-bold mb-4">About this app</h4>
                   <p className="text-white/60 leading-relaxed">
                     {selectedApp.description}
                   </p>
                 </div>
+
+                {/* App Suggestions */}
+                <div className="mb-12">
+                  <h4 className="text-xl font-display font-bold mb-6">You might also like</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {APPS.filter(app => 
+                      app.id !== selectedApp.id && 
+                      app.category === selectedApp.category
+                    ).slice(0, 3).map(suggestedApp => (
+                      <div 
+                        key={suggestedApp.id}
+                        className="glass rounded-2xl p-4 hover:bg-white/10 transition-all cursor-pointer"
+                        onClick={() => setSelectedApp(suggestedApp)}
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                            <img
+                              src={suggestedApp.icon}
+                              alt={suggestedApp.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-bold text-sm truncate">{suggestedApp.name}</h5>
+                            <p className="text-white/40 text-xs truncate">{suggestedApp.developer}</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                              <span className="text-xs font-medium text-white/60">{suggestedApp.rating}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(suggestedApp);
+                          }}
+                          disabled={downloadingApps.has(suggestedApp.id)}
+                          className={`w-full py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                            downloadingApps.has(suggestedApp.id)
+                              ? "bg-blue-600/20 text-blue-400 cursor-not-allowed"
+                              : "bg-white/10 hover:bg-blue-600 hover:text-white"
+                          }`}
+                        >
+                          {downloadingApps.has(suggestedApp.id) ? (
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                              className="w-3.5 h-3.5"
+                            >
+                              <Download className="w-full h-full" />
+                            </motion.div>
+                          ) : (
+                            <>
+                              <Download className="w-3.5 h-3.5" />
+                              Get
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Screenshot Gallery Modal */}
+      <AnimatePresence>
+        {screenshotGallery.isOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative w-full h-full flex items-center justify-center p-4"
+            >
+              {/* Close Button */}
+              <button 
+                onClick={closeScreenshotGallery}
+                className="absolute top-6 right-6 w-12 h-12 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+
+              {/* Navigation Buttons */}
+              {screenshotGallery.images.length > 1 && (
+                <>
+                  <button 
+                    onClick={() => navigateScreenshot('prev')}
+                    className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+                  >
+                    <ChevronRight className="w-6 h-6 text-white rotate-180" />
+                  </button>
+                  <button 
+                    onClick={() => navigateScreenshot('next')}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+                  >
+                    <ChevronRight className="w-6 h-6 text-white" />
+                  </button>
+                </>
+              )}
+
+              {/* Current Screenshot */}
+              <div className="max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center">
+                <img
+                  src={screenshotGallery.images[screenshotGallery.currentIndex]}
+                  alt={`Screenshot ${screenshotGallery.currentIndex + 1}`}
+                  className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+                />
+              </div>
+
+              {/* Image Counter */}
+              {screenshotGallery.images.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/50 text-white text-sm">
+                  {screenshotGallery.currentIndex + 1} / {screenshotGallery.images.length}
+                </div>
+              )}
             </motion.div>
           </div>
         )}

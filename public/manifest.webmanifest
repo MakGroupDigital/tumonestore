@@ -1,6 +1,6 @@
 {
   "name": "Tumone Store",
-  "short_name": "Tumone",
+  "short_name": "Tumone Store",
   "description": "An ultra-fast, modern, and elegant all-in-one app store for iOS, Android, and PWA.",
   "start_url": "/",
   "display": "standalone",

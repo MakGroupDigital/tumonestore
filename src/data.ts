@@ -23,7 +23,7 @@ export const APPS: AppData[] = [
     category: 'Shopping',
     rating: 5.0,
     reviews: '2.5K',
-    size: '25 MB',
+    size: '15.2 MB',
     icon: 'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646601/tumone-store/apps/ekonzo/ekonzoLogo.png',
     description: 'Ekonzo révolutionne l\'achat avec son système d\'achat progressif. Achetez électroménager, mobilier, meubles, services et bien plus encore de manière progressive et flexible. Une nouvelle façon d\'acquérir ce dont vous avez besoin sans contraintes financières.',
     screenshots: [
@@ -43,7 +43,7 @@ export const APPS: AppData[] = [
     category: 'Sports',
     rating: 4.9,
     reviews: '15K',
-    size: '32 MB',
+    size: '28.7 MB',
     icon: 'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646606/tumone-store/apps/ChooseMe/choosemelogo.png',
     description: 'ChooseMe est le réseau social du scouting sportif. Jeunes talents sportifs, postez vos vidéos de performance et soyez repérés par des recruteurs et clubs du monde entier. Votre tremplin vers une carrière sportive professionnelle.',
     screenshots: [
@@ -64,7 +64,7 @@ export const APPS: AppData[] = [
     category: 'Education',
     rating: 4.8,
     reviews: '8.2K',
-    size: '28 MB',
+    size: '12.4 MB',
     icon: 'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646613/tumone-store/apps/Un%2B/logo.png',
     description: 'Un+ est votre plateforme de formations en ligne avec des professionnels experts. Accédez à des cours de qualité, développez vos compétences et apprenez auprès des meilleurs dans leur domaine. L\'éducation professionnelle à portée de main.',
     screenshots: [
