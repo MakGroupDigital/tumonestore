@@ -1,7 +1,8 @@
 {
   "name": "Tumone Store",
   "short_name": "Tumone Store",
-  "description": "An ultra-fast, modern, and elegant all-in-one app store for iOS, Android, and PWA.",
+  "description": "Un store d'applications moderne, rapide et élégant pour Android, iOS et PWA.",
+  "lang": "fr",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050505",

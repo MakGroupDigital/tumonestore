@@ -33,6 +33,130 @@
 .yellow-glow {
   box-shadow: 0 0 45px var(--accent-glow);
 }
+
+.hero-bg-drift {
+  animation: hero-bg-drift 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.hero-aurora {
+  animation: hero-aurora 8s ease-in-out infinite alternate;
+}
+
+.hero-orbit {
+  animation: hero-orbit 14s linear infinite;
+}
+
+.hero-orbit-inner {
+  animation: hero-orbit-inner 10s linear infinite reverse;
+}
+
+.hero-signal-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(247, 199, 28, 0.22), transparent);
+  transform: translateX(-72%);
+  animation: hero-scan 3.6s ease-in-out infinite;
+}
+
+.hero-signal-dot {
+  animation: hero-signal-pulse 2.4s ease-in-out infinite;
+}
+
+.typewriter-cursor {
+  animation: typewriter-cursor 0.82s steps(2, start) infinite;
+}
+
+@keyframes hero-bg-drift {
+  from {
+    transform: scale(1.02) translate3d(-0.6%, -0.4%, 0);
+  }
+  to {
+    transform: scale(1.065) translate3d(0.8%, 0.6%, 0);
+  }
+}
+
+@keyframes hero-aurora {
+  from {
+    opacity: 0.68;
+    filter: saturate(0.95);
+  }
+  to {
+    opacity: 1;
+    filter: saturate(1.18);
+  }
+}
+
+@keyframes hero-orbit {
+  from {
+    transform: translateY(-50%) rotate(0deg) scale(1);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg) scale(1.03);
+  }
+}
+
+@keyframes hero-orbit-inner {
+  from {
+    transform: translateY(-50%) rotate(0deg) scale(0.96);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg) scale(1.04);
+  }
+}
+
+@keyframes hero-scan {
+  0%,
+  18% {
+    transform: translateX(-72%);
+    opacity: 0;
+  }
+  38% {
+    opacity: 1;
+  }
+  76%,
+  100% {
+    transform: translateX(72%);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-signal-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translateY(-50%) scale(0.86);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.28);
+  }
+}
+
+@keyframes typewriter-cursor {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  46%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-drift,
+  .hero-aurora,
+  .hero-orbit,
+  .hero-orbit-inner,
+  .hero-signal-bar::before,
+  .hero-signal-dot,
+  .typewriter-cursor {
+    animation: none;
+  }
+}
 /* Performance optimizations */
 img {
   content-visibility: auto;

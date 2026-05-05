@@ -98,20 +98,20 @@ type PlatformGuide = {
 const BASE_DOWNLOAD_GUIDES_FR: Record<'android' | 'ios' | 'pwa', PlatformGuide> = {
   android: {
     label: 'Android',
-    title: 'Installer une app Tumone Verified',
-    description: 'Du “Get” au lancement, chaque action se fait dans un cadre animé type smartphone.',
+    title: 'Ouvrir une app Tumone Verified',
+    description: 'Le store ouvre uniquement les versions web/PWA, sans APK ni fichier externe.',
     steps: [
       {
-        title: 'Télécharger avec Get',
-        detail: 'Appuyez sur “Get”, choisissez “Télécharger via Tumone Store” et attendez la progression.',
+        title: 'Ouvrir la version web',
+        detail: 'Appuyez sur le bouton web de l’app choisie et autorisez l’ouverture du nouvel onglet.',
       },
       {
-        title: 'Autoriser les sources inconnues',
-        detail: 'Paramètres → Applications → Installer des sources inconnues → activez Tumone Store ou votre navigateur.',
+        title: 'Ajouter à l’écran d’accueil',
+        detail: 'Dans Chrome, ouvrez le menu puis choisissez “Ajouter à l’écran d’accueil” ou “Installer l’app”.',
       },
       {
-        title: 'Suivre la barre d’état',
-        detail: 'La progression anime le bouton jusqu’au “Installer”. Puis ouvrez l’app dès qu’elle est prête.',
+        title: 'Retourner dans Tumone',
+        detail: 'Revenez au store après confirmation pour continuer votre navigation.',
       },
     ],
   },
@@ -233,6 +233,7 @@ const LOCALIZATION: Record<LanguageCode, {
   heroSecure: string;
   heroHeadline: string;
   heroAccent: string;
+  heroTypewriterPhrases: string[];
   heroBody: string;
   heroCta: string;
   trendingTitle: string;
@@ -240,6 +241,10 @@ const LOCALIZATION: Record<LanguageCode, {
   appsFoundLabel: string;
   pulseTitle: string;
   pulseDescription: string;
+  downloadGuideTitle: string;
+  downloadGuideSubtitle: string;
+  guideNext: string;
+  guideRepeat: string;
 }> = {
   fr: {
     navTagline: 'Chargez votre prochaine vague d\'applis',
@@ -248,6 +253,11 @@ const LOCALIZATION: Record<LanguageCode, {
     heroSecure: 'Sécurisé',
     heroHeadline: 'Vivez l\'expérience',
     heroAccent: 'Future des Apps',
+    heroTypewriterPhrases: [
+      'Future des Apps',
+      'Apps fiables et rapides',
+      'Store intelligent',
+    ],
     heroBody: 'Découvrez des applications ultra-rapides, modernes et sécurisées, sélectionnées pour votre appareil.',
     heroCta: 'Explorer maintenant',
     trendingTitle: 'Applications tendance',
@@ -267,6 +277,11 @@ const LOCALIZATION: Record<LanguageCode, {
     heroSecure: 'Secure',
     heroHeadline: 'Experience the',
     heroAccent: 'Future of Apps',
+    heroTypewriterPhrases: [
+      'Future of Apps',
+      'Fast trusted apps',
+      'Smart app store',
+    ],
     heroBody: 'Discover ultra-fast, modern, and secure applications curated just for you.',
     heroCta: 'Explore Now',
     trendingTitle: 'Trending Apps',
@@ -286,6 +301,11 @@ const LOCALIZATION: Record<LanguageCode, {
     heroSecure: 'Bukalenge bukubeba',
     heroHeadline: 'Landa',
     heroAccent: 'Bumulu bwa Maputulu',
+    heroTypewriterPhrases: [
+      'Bumulu bwa Maputulu',
+      'Maputulu ma bukalenge',
+      'Store wa mayele',
+    ],
     heroBody: 'Landa maputulu ya luatshi, ma makaba ne bukalenge bubi ku cikila lukodi wa nshinga.',
     heroCta: 'Tala kusaka',
     trendingTitle: 'Maputulu ma musangu',
@@ -305,6 +325,11 @@ const LOCALIZATION: Record<LanguageCode, {
     heroSecure: 'Nzela ya kobatela',
     heroHeadline: 'Yoka',
     heroAccent: 'Liso ya Applis',
+    heroTypewriterPhrases: [
+      'Liso ya Applis',
+      'Applis ya kotyela motema',
+      'Store ya mayele',
+    ],
     heroBody: 'Kokanisa applis ya suka, ya boboto mpe ya kofongola lifuti.',
     heroCta: 'Tala sikoyo',
     trendingTitle: 'Applis oyo ezali kotambola',
@@ -324,6 +349,11 @@ const LOCALIZATION: Record<LanguageCode, {
     heroSecure: 'Salama',
     heroHeadline: 'Pata uzoefu',
     heroAccent: 'Wakati wa Apps',
+    heroTypewriterPhrases: [
+      'Wakati wa Apps',
+      'Programu za kuaminika',
+      'Store yenye akili',
+    ],
     heroBody: 'Gundua programu za kasi, za kisasa na salama zilizokusanywa kwa ajili yako.',
     heroCta: 'Chunguza sasa',
     trendingTitle: 'Programu zinazovuma',
@@ -476,6 +506,7 @@ export default function App() {
   const [platform, setPlatform] = useState<'ios' | 'android' | 'pwa'>('pwa');
   const [installStatus, setInstallStatus] = useState<'idle' | 'scanning' | 'downloading' | 'completed'>('idle');
   const [installProgress, setInstallProgress] = useState(0);
+  const [installHelpApp, setInstallHelpApp] = useState<AppData | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [downloadingApps, setDownloadingApps] = useState<Set<string>>(new Set());
   const [screenshotGallery, setScreenshotGallery] = useState<{
@@ -484,6 +515,9 @@ export default function App() {
     currentIndex: number;
   }>({ isOpen: false, images: [], currentIndex: 0 });
   const [guideStepIndex, setGuideStepIndex] = useState(0);
+  const [typewriterIndex, setTypewriterIndex] = useState(0);
+  const [typedLength, setTypedLength] = useState(0);
+  const [isDeletingTypewriter, setIsDeletingTypewriter] = useState(false);
   const [guideLastSeen, setGuideLastSeen] = usePersistedState<number | null>('tumone-guide-last-seen', null);
 
   useEffect(() => {
@@ -505,6 +539,62 @@ export default function App() {
   useEffect(() => {
     setGuideStepIndex(0);
   }, [platform, language]);
+
+  useEffect(() => {
+    const htmlLang: Record<LanguageCode, string> = {
+      fr: 'fr',
+      en: 'en',
+      tsh: 'fr-CD',
+      lin: 'ln-CD',
+      sw: 'sw',
+    };
+
+    document.documentElement.lang = htmlLang[language] ?? 'fr';
+  }, [language]);
+
+  useEffect(() => {
+    setTypewriterIndex(0);
+    setTypedLength(0);
+    setIsDeletingTypewriter(false);
+  }, [language]);
+
+  const typewriterPhrases = copy.heroTypewriterPhrases.length > 0
+    ? copy.heroTypewriterPhrases
+    : [copy.heroAccent];
+  const activeTypewriterPhrase = typewriterPhrases[typewriterIndex % typewriterPhrases.length];
+  const typedHeroAccent = activeTypewriterPhrase.slice(0, typedLength);
+
+  useEffect(() => {
+    const isComplete = typedLength === activeTypewriterPhrase.length;
+    const isEmpty = typedLength === 0;
+    const delay = isDeletingTypewriter
+      ? 34
+      : isComplete
+        ? 1300
+        : 62;
+
+    const timer = window.setTimeout(() => {
+      if (!isDeletingTypewriter && isComplete) {
+        setIsDeletingTypewriter(true);
+        return;
+      }
+
+      if (isDeletingTypewriter && isEmpty) {
+        setIsDeletingTypewriter(false);
+        setTypewriterIndex(prev => (prev + 1) % typewriterPhrases.length);
+        return;
+      }
+
+      setTypedLength(prev => prev + (isDeletingTypewriter ? -1 : 1));
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    activeTypewriterPhrase,
+    isDeletingTypewriter,
+    typedLength,
+    typewriterPhrases.length,
+  ]);
 
   const downloadGuide = (DOWNLOAD_GUIDES[language] ?? DOWNLOAD_GUIDES.fr)[platform];
   const guideSteps = downloadGuide.steps;
@@ -572,125 +662,66 @@ export default function App() {
     }));
   };
 
-  const handleModalDownload = async (app: AppData) => {
-    // Détection automatique de la plateforme et redirection directe pour iOS
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    
-    if (isIOS && app.iosUrl) {
-      // Redirection directe vers PWA pour iOS
-      window.open(app.iosUrl, '_blank');
-      return;
+  const getAppWebUrl = (app: AppData) => app.pwaUrl || app.iosUrl || '';
+  const installHelpSteps = platform === 'ios'
+    ? [
+      'Dans Safari, touchez le bouton Partager.',
+      'Choisissez “Ajouter à l’écran d’accueil”.',
+      'Validez le nom, puis revenez dans Tumone Store.',
+    ]
+    : platform === 'android'
+      ? [
+        'Dans Chrome, ouvrez le menu en haut à droite.',
+        'Touchez “Installer l’app” ou “Ajouter à l’écran d’accueil”.',
+        'Confirmez l’installation, puis revenez dans Tumone Store.',
+      ]
+      : [
+        'Dans la barre d’adresse, cliquez sur l’icône d’installation si elle apparaît.',
+        'Sinon, ouvrez le menu du navigateur puis choisissez “Installer”.',
+        'Confirmez, puis revenez dans Tumone Store.',
+      ];
+
+  const openAppWebVersion = (app: AppData) => {
+    const webUrl = getAppWebUrl(app);
+    if (!webUrl) return null;
+
+    setInstallHelpApp(app);
+    const openedWindow = window.open(webUrl, '_blank', 'noopener,noreferrer');
+    if (!openedWindow) {
+      window.location.href = webUrl;
     }
 
-    // Pour Android et autres plateformes
+    return openedWindow;
+  };
+
+  const handleModalDownload = async (app: AppData) => {
+    if (!getAppWebUrl(app)) return;
+
     setInstallStatus('scanning');
     setInstallProgress(0);
 
-    // Simulate Security Scan
-    await new Promise(resolve => setTimeout(resolve, 800));
+    openAppWebVersion(app);
+
+    await new Promise(resolve => setTimeout(resolve, 350));
 
     setInstallStatus('downloading');
-    // Simulate Download Progress
-    for (let i = 0; i <= 100; i += 25) {
+    for (let i = 25; i <= 100; i += 25) {
       setInstallProgress(i);
       await new Promise(resolve => setTimeout(resolve, 80));
     }
 
     setInstallStatus('completed');
-
-    // Téléchargement après simulation
-    setTimeout(() => {
-      let downloadUrl = '';
-
-      if (platform === 'android' && app.androidUrl) {
-        downloadUrl = app.androidUrl;
-      } else if (platform === 'ios' && app.iosUrl) {
-        downloadUrl = app.iosUrl;
-      } else if (app.pwaUrl) {
-        downloadUrl = app.pwaUrl;
-      } else {
-        downloadUrl = app.androidUrl || app.iosUrl || '';
-      }
-
-      if (downloadUrl) {
-        try {
-          // Pour les liens Play Store, ouvrir directement
-          if (downloadUrl.includes('play.google.com')) {
-            window.open(downloadUrl, '_blank');
-          } else {
-            // Téléchargement direct pour les APK
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }
-        } catch (error) {
-          console.error('Download error:', error);
-          window.open(downloadUrl, '_blank');
-        }
-      }
-
-      setInstallStatus('idle');
-    }, 600);
   };
 
   const handleDownload = async (app: AppData) => {
-    // Détection automatique de la plateforme et redirection directe pour iOS
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    
-    if (isIOS && app.iosUrl) {
-      // Redirection directe vers PWA pour iOS
-      window.open(app.iosUrl, '_blank');
-      return;
-    }
+    if (!getAppWebUrl(app)) return;
 
-    // Ajouter l'app à la liste des téléchargements en cours
     setDownloadingApps(prev => new Set(prev).add(app.id));
 
     try {
-      // Simulation du délai de traitement
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Pour Android et autres plateformes
-      let downloadUrl = '';
-
-      if (platform === 'android' && app.androidUrl) {
-        downloadUrl = app.androidUrl;
-      } else if (platform === 'ios' && app.iosUrl) {
-        downloadUrl = app.iosUrl;
-      } else if (app.pwaUrl) {
-        downloadUrl = app.pwaUrl;
-      } else {
-        downloadUrl = app.androidUrl || app.iosUrl || '';
-      }
-
-      if (downloadUrl) {
-        try {
-          // Pour les liens Play Store, ouvrir directement
-          if (downloadUrl.includes('play.google.com')) {
-            window.open(downloadUrl, '_blank');
-          } else {
-            // Téléchargement direct pour les APK
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `${app.name.toLowerCase().replace(/\s+/g, '-')}.apk`;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }
-        } catch (error) {
-          console.error('Download error:', error);
-          window.open(downloadUrl, '_blank');
-        }
-      }
+      openAppWebVersion(app);
+      await new Promise(resolve => setTimeout(resolve, 650));
     } finally {
-      // Retirer l'app de la liste des téléchargements en cours
       setDownloadingApps(prev => {
         const newSet = new Set(prev);
         newSet.delete(app.id);
@@ -826,36 +857,63 @@ export default function App() {
         {/* Hero Section */}
         {searchQuery === '' && selectedCategory === 'All' && (
           <section className="mb-8 sm:mb-12">
-            <div className="relative h-[250px] sm:h-[350px] lg:h-[400px] rounded-[20px] sm:rounded-[32px] overflow-hidden group">
+            <div className="relative min-h-[430px] sm:min-h-[500px] overflow-hidden rounded-[28px] border border-white/10 bg-[#050505] shadow-[0_34px_110px_rgba(0,0,0,0.52)] group">
               <img
                 src="/medium-shot-man-posing-futuristic-portrait.jpg"
                 alt="Featured"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="hero-bg-drift absolute inset-0 h-full w-full object-cover object-center"
                 loading="eager"
                 decoding="async"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-4 sm:p-6 lg:p-8 xl:p-12 w-full">
-                <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4">
-                  <span className="px-2 sm:px-3 py-1 rounded-full bg-[color:var(--accent-yellow)] text-black text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
-                    {copy.heroBadge}
-                  </span>
-                  <div className="flex items-center gap-1 text-[color:var(--accent-yellow)] text-[10px] sm:text-xs font-medium">
-                    <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                    {copy.heroSecure}
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.78)_40%,rgba(0,0,0,0.18)_72%,rgba(0,0,0,0.62)_100%)]" />
+              <div className="hero-aurora absolute inset-0 bg-[radial-gradient(circle_at_24%_24%,rgba(247,199,28,0.22),transparent_25%),radial-gradient(circle_at_78%_20%,rgba(255,255,255,0.12),transparent_20%),radial-gradient(circle_at_68%_76%,rgba(16,185,129,0.16),transparent_28%)]" />
+              <div className="absolute left-6 right-6 top-6 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-black via-black/65 to-transparent" />
+              <div className="hero-orbit pointer-events-none absolute right-8 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full border border-white/10 bg-white/[0.025] shadow-[inset_0_0_80px_rgba(255,255,255,0.05),0_0_90px_rgba(247,199,28,0.12)] lg:block" />
+              <div className="hero-orbit-inner pointer-events-none absolute right-24 top-1/2 hidden h-44 w-44 -translate-y-1/2 rounded-full border border-[color:var(--accent-yellow)]/20 lg:block" />
+
+              <div className="relative z-10 flex min-h-[430px] sm:min-h-[500px] flex-col gap-8 p-5 sm:gap-10 sm:p-8 lg:p-12">
+                <div className="relative z-10 flex items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-[color:var(--accent-yellow)] px-3 py-1 text-[9px] font-bold uppercase tracking-[0.24em] text-black shadow-[0_0_34px_rgba(247,199,28,0.3)] sm:text-[10px]">
+                      {copy.heroBadge}
+                    </span>
+                    <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-[10px] font-medium text-white/75 backdrop-blur-xl sm:text-xs">
+                      <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                      {copy.heroSecure}
+                    </div>
+                  </div>
+                  <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-xs text-white/65 backdrop-blur-xl sm:flex">
+                    <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.85)]" />
+                    {filteredApps.length} {copy.appsFoundLabel}
                   </div>
                 </div>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-6xl font-display font-bold mb-2 sm:mb-4 leading-tight">
-                  {copy.heroHeadline} <br className="hidden sm:block" />
-                  <span className="gradient-text">{copy.heroAccent}</span>
-                </h2>
-                <p className="text-white/60 max-w-xs sm:max-w-md mb-4 sm:mb-8 text-xs sm:text-sm lg:text-base leading-relaxed">
-                  {copy.heroBody}
-                </p>
-                <button className="px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 bg-[color:var(--accent-yellow)] text-black rounded-xl sm:rounded-2xl font-bold hover:bg-[color:var(--accent-yellow-deep)] transition-colors flex items-center gap-2 text-sm sm:text-base">
-                  {copy.heroCta}
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
+
+                <div className="relative z-10 mt-auto max-w-3xl">
+                  <h2 className="text-4xl font-display font-bold leading-[0.92] sm:text-6xl lg:text-7xl xl:text-8xl">
+                    {copy.heroHeadline} <br className="hidden sm:block" />
+                    <span className="gradient-text inline-flex min-h-[1.05em] items-baseline">
+                      {typedHeroAccent || '\u00a0'}
+                      <span className="typewriter-cursor ml-1 inline-block h-[0.78em] w-[3px] rounded-full bg-[color:var(--accent-yellow)] align-[-0.04em]" />
+                    </span>
+                  </h2>
+                  <p className="mt-5 max-w-xl text-sm leading-relaxed text-white/68 sm:text-base lg:text-lg">
+                    {copy.heroBody}
+                  </p>
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <button className="flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-black shadow-[0_20px_55px_rgba(255,255,255,0.16)] transition hover:bg-[color:var(--accent-yellow)] sm:px-7 sm:py-3.5 sm:text-base">
+                      {copy.heroCta}
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="hero-signal-bar pointer-events-none relative z-10 h-14 rounded-full border border-white/10 bg-white/[0.035] shadow-[0_24px_80px_rgba(247,199,28,0.12)] backdrop-blur-xl sm:h-16">
+                  <div className="absolute inset-x-8 top-1/2 h-px bg-gradient-to-r from-transparent via-[color:var(--accent-yellow)]/70 to-transparent" />
+                  <div className="hero-signal-dot absolute left-[16%] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[color:var(--accent-yellow)] shadow-[0_0_20px_rgba(247,199,28,0.9)]" />
+                  <div className="hero-signal-dot absolute left-[48%] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-white/80 shadow-[0_0_18px_rgba(255,255,255,0.7)] [animation-delay:0.8s]" />
+                  <div className="hero-signal-dot absolute right-[18%] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.8)] [animation-delay:1.6s]" />
+                </div>
               </div>
             </div>
           </section>
@@ -918,7 +976,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 app-grid">
+          <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 app-grid">
             <AnimatePresence mode="popLayout">
               {filteredApps.map((app) => (
                 <motion.div
@@ -928,37 +986,35 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   onClick={() => setSelectedApp(app)}
-                  className="group glass rounded-[28px] p-5 cursor-pointer hover:bg-white/10 transition-all hover:border-white/20"
+                  className="group glass aspect-square rounded-[20px] p-3 sm:p-4 cursor-pointer hover:bg-white/10 transition-all hover:border-white/20 flex flex-col items-center justify-between text-center"
                 >
-                  <div className="flex gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl group-hover:scale-105 transition-transform">
+                  <div className="flex w-full min-w-0 flex-col items-center">
+                    <div className="h-12 w-12 overflow-hidden rounded-2xl shadow-xl transition-transform group-hover:scale-105 sm:h-16 sm:w-16">
                       <OptimizedImage
                         src={app.icon}
                         alt={app.name}
                         className="w-full h-full"
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-lg truncate group-hover:text-blue-400 transition-colors">{app.name}</h4>
-                      <p className="text-white/40 text-sm truncate">{app.developer}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                        <span className="text-xs font-medium text-white/60">{app.rating}</span>
-                        <span className="text-[10px] text-white/30 ml-1">• {app.category}</span>
-                      </div>
+                    <div className="mt-2 w-full min-w-0 sm:mt-3">
+                      <h4 className="truncate text-xs font-bold transition-colors group-hover:text-blue-400 sm:text-sm">{app.name}</h4>
+                      <p className="mt-0.5 truncate text-[10px] text-white/38 sm:text-xs">{app.category}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-[10px] text-white/40 font-medium uppercase tracking-wider">
-                      {app.size}
+
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-1 text-[10px] font-medium text-white/55 sm:text-xs">
+                      <Star className="h-3 w-3 shrink-0 fill-yellow-500 text-yellow-500" />
+                      <span>{app.rating}</span>
                     </div>
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDownload(app);
                       }}
+                      aria-label={`Ouvrir la version web de ${app.name}`}
                       disabled={downloadingApps.has(app.id)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 min-w-[60px] justify-center ${
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition-all sm:h-9 sm:w-9 ${
                         downloadingApps.has(app.id)
                           ? "bg-blue-600/20 text-blue-400 cursor-not-allowed"
                           : "bg-white/10 hover:bg-blue-600 hover:text-white"
@@ -973,10 +1029,7 @@ export default function App() {
                           <Download className="w-full h-full" />
                         </motion.div>
                       ) : (
-                        <>
-                          <Download className="w-3.5 h-3.5" />
-                          Get
-                        </>
+                        <Globe className="w-3.5 h-3.5" />
                       )}
                     </button>
                   </div>
@@ -1084,11 +1137,19 @@ export default function App() {
 
                     <div className="flex flex-wrap gap-4">
                       <button 
-                        disabled={installStatus !== 'idle'}
-                        onClick={() => handleModalDownload(selectedApp)}
+                        disabled={installStatus === 'scanning' || installStatus === 'downloading'}
+                        onClick={() => {
+                          if (installStatus === 'completed') {
+                            setInstallStatus('idle');
+                            setSelectedApp(null);
+                            return;
+                          }
+
+                          handleModalDownload(selectedApp);
+                        }}
                         className={cn(
                           "flex-1 min-w-[200px] py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 shadow-xl",
-                          installStatus === 'idle' 
+                          installStatus === 'idle' || installStatus === 'completed'
                             ? "bg-white text-black hover:bg-blue-50 shadow-white/5" 
                             : "bg-blue-600/20 text-blue-400 cursor-default"
                         )}
@@ -1096,7 +1157,7 @@ export default function App() {
                         {installStatus === 'idle' && (
                           <>
                             <Download className="w-5 h-5" />
-                            Install Now
+                            Ouvrir la version web
                           </>
                         )}
                         {installStatus === 'scanning' && (
@@ -1107,13 +1168,13 @@ export default function App() {
                             >
                               <ShieldCheck className="w-5 h-5" />
                             </motion.div>
-                            Scanning for threats...
+                            Préparation sécurisée...
                           </>
                         )}
                         {installStatus === 'downloading' && (
                           <div className="flex flex-col items-center w-full px-4">
                             <div className="flex justify-between w-full mb-1 text-xs">
-                              <span>Downloading...</span>
+                              <span>Ouverture web...</span>
                               <span>{installProgress}%</span>
                             </div>
                             <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -1128,7 +1189,7 @@ export default function App() {
                         {installStatus === 'completed' && (
                           <>
                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                            Securely Installed
+                            Retour au Store
                           </>
                         )}
                       </button>
@@ -1251,8 +1312,8 @@ export default function App() {
                             </motion.div>
                           ) : (
                             <>
-                              <Download className="w-3.5 h-3.5" />
-                              Get
+                              <Globe className="w-3.5 h-3.5" />
+                              Web
                             </>
                           )}
                         </button>
@@ -1260,6 +1321,80 @@ export default function App() {
                     ))}
                   </div>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* PWA Install Helper */}
+      <AnimatePresence>
+        {installHelpApp && (
+          <div className="fixed inset-0 z-[55] flex items-end justify-center p-4 sm:items-center sm:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setInstallHelpApp(null)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 28, scale: 0.98 }}
+              className="relative w-full max-w-lg rounded-[32px] border border-white/10 bg-[#080808]/95 p-6 shadow-2xl backdrop-blur-2xl"
+            >
+              <button
+                onClick={() => setInstallHelpApp(null)}
+                className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="flex items-center gap-4 pr-12">
+                <img
+                  src={installHelpApp.icon}
+                  alt={installHelpApp.name}
+                  className="h-14 w-14 rounded-2xl border border-white/10 object-cover"
+                />
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.28em] text-[color:var(--accent-yellow)]">Installation PWA</p>
+                  <h3 className="mt-1 truncate text-2xl font-display font-bold">{installHelpApp.name}</h3>
+                </div>
+              </div>
+
+              <p className="mt-5 text-sm leading-relaxed text-white/62">
+                La PWA est ouverte dans un nouvel onglet. Pour l’ajouter à l’écran d’accueil, confirmez l’installation dans votre navigateur.
+              </p>
+
+              <div className="mt-5 space-y-3">
+                {installHelpSteps.map((step, index) => (
+                  <div key={step} className="flex gap-3 rounded-2xl border border-white/8 bg-white/[0.045] p-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent-yellow)] text-xs font-bold text-black">
+                      {index + 1}
+                    </span>
+                    <p className="text-sm leading-snug text-white/75">{step}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={() => openAppWebVersion(installHelpApp)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-black transition hover:bg-[color:var(--accent-yellow)]"
+                >
+                  <Globe className="h-4 w-4" />
+                  Ouvrir la PWA
+                </button>
+                <button
+                  onClick={() => {
+                    setInstallHelpApp(null);
+                    setInstallStatus('idle');
+                  }}
+                  className="flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white/80 transition hover:bg-white/10"
+                >
+                  Retour au Store
+                </button>
               </div>
             </motion.div>
           </div>

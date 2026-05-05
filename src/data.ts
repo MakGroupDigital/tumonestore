@@ -9,7 +9,6 @@ export interface AppData {
   icon: string;
   description: string;
   screenshots: string[];
-  androidUrl?: string;
   iosUrl?: string;
   pwaUrl?: string;
   isVerified: boolean;
@@ -32,7 +31,7 @@ export const APPS: AppData[] = [
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646669/tumone-store/apps/ekonzo/Ekonzo._Screen_3.png',
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646673/tumone-store/apps/ekonzo/Ekonzo._Screen_4.png',
     ],
-    androidUrl: '/App/ekonzo/ekonzo.apk',
+    pwaUrl: 'https://ekonzo.groupetumone-sarlu.com',
     iosUrl: 'https://ekonzo.groupetumone-sarlu.com',
     isVerified: true,
   },
@@ -53,7 +52,7 @@ export const APPS: AppData[] = [
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773611933/tumone-store/apps/ChooseMe/Choo._Screen04.png',
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773611934/tumone-store/apps/ChooseMe/Choo._Screen05.png',
     ],
-    androidUrl: '/App/ChooseMe/choose-me-release.apk',
+    pwaUrl: 'https://app.choose-me.net/',
     iosUrl: 'https://app.choose-me.net/',
     isVerified: true,
   },
@@ -74,7 +73,7 @@ export const APPS: AppData[] = [
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646697/tumone-store/apps/Un%2B/ecran_Un_4.png',
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646701/tumone-store/apps/Un%2B/ecran_Un_5.png',
     ],
-    androidUrl: 'https://play.google.com/store/apps/details?id=com.ashuza.unplus53',
+    pwaUrl: 'https://unplus.groupetumone-sarlu.com',
     iosUrl: 'https://unplus.groupetumone-sarlu.com',
     isVerified: true,
   },
