@@ -83,6 +83,125 @@ const CATEGORIES = [
   { name: 'Sports', icon: Trophy },
 ];
 
+type FooterPageId = 'privacy' | 'terms' | 'developer';
+
+const FOOTER_PAGES: Record<FooterPageId, {
+  eyebrow: string;
+  title: string;
+  summary: string;
+  updatedAt: string;
+  sections: { title: string; body: string[] }[];
+}> = {
+  privacy: {
+    eyebrow: 'Confiance et données',
+    title: 'Privacy Policy',
+    summary: 'Cette politique décrit notre approche de confidentialité pour Tumone Store, en reprenant les standards attendus sur les stores modernes : transparence, minimisation des données, sécurité et contrôle utilisateur.',
+    updatedAt: 'Dernière mise à jour : 5 mai 2026',
+    sections: [
+      {
+        title: 'Transparence des données',
+        body: [
+          'Chaque app publiée ou référencée doit expliquer clairement les données qu’elle collecte, pourquoi elle les collecte et comment l’utilisateur peut exercer ses droits.',
+          'Comme sur les grands stores, les informations de confidentialité doivent rester cohérentes avec les fonctionnalités réelles de l’app et avec les permissions demandées.',
+        ],
+      },
+      {
+        title: 'Minimisation et finalité',
+        body: [
+          'Tumone Store ne doit traiter que les informations nécessaires au fonctionnement du store : préférences locales, langue, navigation, sécurité et amélioration de l’expérience.',
+          'Les développeurs doivent éviter toute collecte excessive et ne pas détourner les données vers des usages non déclarés, publicitaires ou frauduleux.',
+        ],
+      },
+      {
+        title: 'Sécurité, consentement et contrôle',
+        body: [
+          'Les apps doivent demander les permissions sensibles uniquement quand elles sont nécessaires et avec un contexte compréhensible pour l’utilisateur.',
+          'L’utilisateur garde le contrôle : refus d’une permission, suppression des données locales, désinstallation, signalement et accès aux politiques propres de chaque app.',
+        ],
+      },
+      {
+        title: 'Apps tierces et responsabilités',
+        body: [
+          'Les apps référencées dans Tumone Store peuvent disposer de leurs propres conditions, politiques de confidentialité et systèmes de compte.',
+          'Tumone Store peut retirer une app qui présente un risque de sécurité, une collecte opaque, une usurpation d’identité ou une violation manifeste des règles de confiance.',
+        ],
+      },
+    ],
+  },
+  terms: {
+    eyebrow: 'Règles du service',
+    title: 'Terms of Service',
+    summary: 'Ces conditions définissent les règles d’utilisation de Tumone Store comme marketplace applicative : découverte, distribution, qualité, conformité et protection des utilisateurs.',
+    updatedAt: 'Dernière mise à jour : 5 mai 2026',
+    sections: [
+      {
+        title: 'Rôle de Tumone Store',
+        body: [
+          'Tumone Store permet aux utilisateurs de découvrir, consulter et ouvrir des applications sélectionnées, selon des critères de qualité, sécurité, transparence et pertinence.',
+          'Le store peut référencer des expériences web, PWA ou autres formats applicatifs compatibles, sans se limiter à une seule technologie de distribution.',
+        ],
+      },
+      {
+        title: 'Qualité, sécurité et revue',
+        body: [
+          'Les apps doivent fonctionner comme annoncé, ne pas tromper l’utilisateur, ne pas copier abusivement une marque existante et ne pas manipuler notes, avis ou découverte.',
+          'Tumone Store peut refuser, masquer, suspendre ou retirer une app qui présente un contenu dangereux, illégal, trompeur, malveillant ou contraire aux standards de distribution applicative.',
+        ],
+      },
+      {
+        title: 'Distribution et disponibilité',
+        body: [
+          'Les liens et fiches d’app doivent pointer vers des expériences officielles, stables et maintenues. Les métadonnées, captures, noms et descriptions doivent être exacts.',
+          'L’accès à une app peut dépendre du réseau, de l’appareil, du navigateur, du pays, des politiques du développeur ou d’un service tiers.',
+        ],
+      },
+      {
+        title: 'Comptes, paiements et conformité',
+        body: [
+          'Lorsqu’une app propose des comptes, abonnements, achats ou contenus payants, elle doit présenter ses conditions de manière claire avant l’engagement de l’utilisateur.',
+          'Les développeurs restent responsables du respect des lois applicables, de leurs licences, de leur propriété intellectuelle et des obligations liées aux plateformes utilisées.',
+        ],
+      },
+    ],
+  },
+  developer: {
+    eyebrow: 'Publication et intégration',
+    title: 'Developer Portal',
+    summary: 'Un espace de référence pour les développeurs qui souhaitent publier une app sur Tumone Store selon des standards proches des marketplaces reconnues.',
+    updatedAt: 'Version portail : 2026.05',
+    sections: [
+      {
+        title: 'Préparer une soumission',
+        body: [
+          'Fournissez le nom de l’app, le développeur, une description claire, la catégorie, l’âge ou public visé, les régions ciblées, les liens officiels et une politique de confidentialité.',
+          'Les métadonnées doivent être fiables : pas de mots-clés trompeurs, pas de fausses captures, pas d’usurpation de marque, pas de promesse que l’app ne tient pas.',
+        ],
+      },
+      {
+        title: 'Assets et expérience produit',
+        body: [
+          'Préparez une icône nette, des captures réelles, une description courte, les informations de support, les liens légaux et une expérience adaptée mobile comme desktop.',
+          'L’app doit être stable, rapide, accessible, maintenue et capable de gérer les erreurs, les écrans vides, les permissions et les états hors ligne quand c’est pertinent.',
+        ],
+      },
+      {
+        title: 'Sécurité et conformité développeur',
+        body: [
+          'Les développeurs doivent déclarer les données collectées, protéger les comptes utilisateurs, respecter les droits d’auteur, éviter les contenus interdits et fournir un canal de support.',
+          'Les comportements malveillants, la collecte cachée, les fonctionnalités non déclarées, la manipulation d’avis ou l’imitation d’une app connue peuvent entraîner un retrait.',
+        ],
+      },
+      {
+        title: 'Distribution et cycle de vie',
+        body: [
+          'Tumone Store peut demander des corrections avant publication, contrôler les mises à jour importantes et retirer une app devenue indisponible ou non conforme.',
+          'Les développeurs doivent maintenir leurs liens, informer des changements majeurs et s’assurer que l’expérience distribuée reste conforme aux informations publiées.',
+        ],
+      },
+    ],
+  },
+};
+
 type GuideStep = {
   title: string;
   detail: string;
@@ -507,6 +626,7 @@ export default function App() {
   const [installStatus, setInstallStatus] = useState<'idle' | 'scanning' | 'downloading' | 'completed'>('idle');
   const [installProgress, setInstallProgress] = useState(0);
   const [installHelpApp, setInstallHelpApp] = useState<AppData | null>(null);
+  const [footerPage, setFooterPage] = useState<FooterPageId | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [downloadingApps, setDownloadingApps] = useState<Set<string>>(new Set());
   const [screenshotGallery, setScreenshotGallery] = useState<{
@@ -1457,6 +1577,91 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Footer Pages */}
+      <AnimatePresence>
+        {footerPage && (
+          <motion.div
+            className="fixed inset-0 z-[58] overflow-y-auto bg-[#050505]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-6 py-6 sm:py-10">
+              <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 overflow-hidden rounded-xl border border-white/10 bg-white/5 yellow-glow">
+                    <img src="/logo.png" alt="Tumone Store" className="h-full w-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="font-display text-lg font-bold">Tumone Store</p>
+                    <p className="text-xs text-white/38">{FOOTER_PAGES[footerPage].eyebrow}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setFooterPage(null)}
+                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                  Retour
+                </button>
+              </div>
+
+              <main className="py-10 sm:py-14">
+                <div className="max-w-3xl">
+                  <p className="text-xs font-bold uppercase tracking-[0.32em] text-[color:var(--accent-yellow)]">
+                    {FOOTER_PAGES[footerPage].eyebrow}
+                  </p>
+                  <h1 className="mt-4 text-4xl font-display font-bold leading-tight sm:text-6xl">
+                    {FOOTER_PAGES[footerPage].title}
+                  </h1>
+                  <p className="mt-5 text-base leading-relaxed text-white/64 sm:text-lg">
+                    {FOOTER_PAGES[footerPage].summary}
+                  </p>
+                  <p className="mt-4 text-sm text-white/38">{FOOTER_PAGES[footerPage].updatedAt}</p>
+                </div>
+
+                <div className="mt-10 grid gap-4">
+                  {FOOTER_PAGES[footerPage].sections.map((section, index) => (
+                    <section key={section.title} className="rounded-[28px] border border-white/10 bg-white/[0.035] p-5 backdrop-blur-xl sm:p-7">
+                      <div className="flex items-start gap-4">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--accent-yellow)] text-sm font-bold text-black">
+                          {index + 1}
+                        </span>
+                        <div>
+                          <h2 className="text-xl font-display font-bold">{section.title}</h2>
+                          <div className="mt-4 space-y-3">
+                            {section.body.map((paragraph) => (
+                              <p key={paragraph} className="text-sm leading-relaxed text-white/62 sm:text-base">
+                                {paragraph}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  ))}
+                </div>
+
+                {footerPage === 'developer' && (
+                  <div className="mt-8 rounded-[28px] border border-emerald-400/20 bg-emerald-400/[0.055] p-6">
+                    <h2 className="font-display text-2xl font-bold">Soumettre une app</h2>
+                    <p className="mt-3 text-sm leading-relaxed text-white/65">
+                      Préparez votre fiche produit, vos captures, votre logo, vos liens officiels, votre politique de confidentialité et les informations développeur. L’équipe Tumone pourra ensuite examiner l’intégration dans le store.
+                    </p>
+                    <button
+                      onClick={() => setFooterPage(null)}
+                      className="mt-5 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-[color:var(--accent-yellow)]"
+                    >
+                      Retour au Store
+                    </button>
+                  </div>
+                )}
+              </main>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-6 py-12 border-t border-white/5 mt-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
@@ -1467,9 +1672,9 @@ export default function App() {
             <span className="font-display font-bold text-lg">Tumone Store</span>
           </div>
           <div className="flex gap-8 text-white/40 text-sm">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Developer Portal</a>
+            <button onClick={() => setFooterPage('privacy')} className="hover:text-white transition-colors">Privacy Policy</button>
+            <button onClick={() => setFooterPage('terms')} className="hover:text-white transition-colors">Terms of Service</button>
+            <button onClick={() => setFooterPage('developer')} className="hover:text-white transition-colors">Developer Portal</button>
           </div>
           <div className="flex items-center gap-4">
             <Apple className="w-5 h-5 text-white/20" />
