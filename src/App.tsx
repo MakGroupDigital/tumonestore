@@ -217,12 +217,12 @@ type PlatformGuide = {
 const BASE_DOWNLOAD_GUIDES_FR: Record<'android' | 'ios' | 'pwa', PlatformGuide> = {
   android: {
     label: 'Android',
-    title: 'Ouvrir une app Tumone Verified',
-    description: 'Le store ouvre uniquement les versions web/PWA, sans APK ni fichier externe.',
+    title: 'Installer une app Tumone Verified',
+    description: 'Tumone lance l’app officielle et vous accompagne jusqu’à la confirmation d’installation.',
     steps: [
       {
-        title: 'Ouvrir la version web',
-        detail: 'Appuyez sur le bouton web de l’app choisie et autorisez l’ouverture du nouvel onglet.',
+        title: 'Appuyer sur Installer',
+        detail: 'Choisissez l’app, appuyez sur “Installer” et laissez Tumone ouvrir l’expérience officielle.',
       },
       {
         title: 'Ajouter à l’écran d’accueil',
@@ -236,7 +236,7 @@ const BASE_DOWNLOAD_GUIDES_FR: Record<'android' | 'ios' | 'pwa', PlatformGuide> 
   },
   ios: {
     label: 'iPhone',
-    title: 'Ajouter Tumone Store en PWA',
+    title: 'Ajouter Tumone Store à l’écran d’accueil',
     description: 'Safari affiche un mockup iPhone avec le guide pas-à-pas, prêt pour vous.',
     steps: [
       {
@@ -254,9 +254,9 @@ const BASE_DOWNLOAD_GUIDES_FR: Record<'android' | 'ios' | 'pwa', PlatformGuide> 
     ],
   },
   pwa: {
-    label: 'Web / PWA',
+    label: 'Navigateur',
     title: 'Installer sur tout appareil',
-    description: 'Un cadre universel illustre la session en cours sur le navigateur ou le PWA.',
+    description: 'Un cadre universel illustre la session en cours depuis le navigateur.',
     steps: [
       {
         title: 'Cliquer sur le menu',
@@ -278,25 +278,25 @@ const BASE_DOWNLOAD_GUIDES_EN: typeof BASE_DOWNLOAD_GUIDES_FR = {
   android: {
     label: 'Android',
     title: 'Install a Tumone Verified app',
-    description: 'The animated phone frame walks you through download, permissions, and install.',
+    description: 'Tumone launches the official app experience and guides the user to the install confirmation.',
     steps: [
       {
-        title: 'Tap Get',
-        detail: 'Hit “Get”, choose “Download with Tumone Store” and let the APK stream.',
+        title: 'Tap Install',
+        detail: 'Choose an app, tap “Install” and let Tumone open the official experience.',
       },
       {
-        title: 'Allow unknown sources',
-        detail: 'Settings → Apps → Install unknown apps → allow Tumone Store or your browser.',
+        title: 'Add to Home Screen',
+        detail: 'Open the browser menu, then choose “Install app” or “Add to Home Screen”.',
       },
       {
-        title: 'Follow the progress',
-        detail: 'Progress animates until “Install” clears, then open the app instantly.',
+        title: 'Return to Tumone',
+        detail: 'Confirm the installation, then return to Tumone Store to keep browsing.',
       },
     ],
   },
   ios: {
     label: 'iPhone',
-    title: 'Add Tumone Store as a PWA',
+    title: 'Add Tumone Store to Home Screen',
     description: 'A sleek iPhone frame mirrors Safari and explains each tap.',
     steps: [
       {
@@ -309,14 +309,14 @@ const BASE_DOWNLOAD_GUIDES_EN: typeof BASE_DOWNLOAD_GUIDES_FR = {
       },
       {
         title: 'Launch the icon',
-        detail: 'It opens fullscreen, ready to host every verified download.',
+        detail: 'It opens fullscreen, ready to launch every verified app.',
       },
     ],
   },
   pwa: {
-    label: 'Web / PWA',
+    label: 'Browser',
     title: 'Install on any device',
-    description: 'This universal frame highlights the install flow for browsers and PWAs.',
+    description: 'This universal frame highlights the install flow from the browser.',
     steps: [
       {
         title: 'Open the menu',
@@ -343,6 +343,7 @@ const DOWNLOAD_GUIDES: Record<LanguageCode, typeof BASE_DOWNLOAD_GUIDES_FR> = {
 };
 
 const GUIDE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+const REDIRECT_DELAY_MS = 4000;
 const LANGUAGE_OPTIONS: LanguageCode[] = ['fr', 'en', 'tsh', 'lin', 'sw'];
 
 const LOCALIZATION: Record<LanguageCode, {
@@ -384,7 +385,7 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'apps trouvées',
     pulseTitle: 'Radar Tumone',
     pulseDescription: 'Suivez ce qui surfe sur les régions, appareils et créateurs. Tumone Radar repère les tendances avant qu\'elles n\'explosent.',
-    downloadGuideTitle: 'Guide tactile pour télécharger',
+    downloadGuideTitle: 'Guide tactile pour installer',
     downloadGuideSubtitle: 'Un flux immersif par plateforme pour installer nos apps Tumone Verified comme un pro.',
     guideNext: 'Suivant',
     guideRepeat: 'Recommencer',
@@ -408,7 +409,7 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'apps found',
     pulseTitle: 'Pulse Radar',
     pulseDescription: 'Track what is surging across regions, devices, and creators. Tumone Radar highlights momentum before it becomes mainstream.',
-    downloadGuideTitle: 'Download guide',
+    downloadGuideTitle: 'Install guide',
     downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
     guideNext: 'Next step',
     guideRepeat: 'Restart',
@@ -432,7 +433,7 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'maputulu ebikalile',
     pulseTitle: 'Radar ya Tumone',
     pulseDescription: 'Sunga memebi ya mawa, mapatya ne bana ba kulindila. Tumone Radar yalaka makambu liboso ya kusomba.',
-    downloadGuideTitle: 'Download guide',
+    downloadGuideTitle: 'Guide d’installation',
     downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
     guideNext: 'Suivant',
     guideRepeat: 'Recommencer',
@@ -456,7 +457,7 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'applis oyo tozui',
     pulseTitle: 'Radar ya Tumone',
     pulseDescription: 'Tala oyo ezali kopusa na bitumba, bisika mpe bato ya kokelisa. Tumone Radar eyakana liboso.',
-    downloadGuideTitle: 'Download guide',
+    downloadGuideTitle: 'Guide d’installation',
     downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
     guideNext: 'Suivant',
     guideRepeat: 'Recommencer',
@@ -480,7 +481,7 @@ const LOCALIZATION: Record<LanguageCode, {
     appsFoundLabel: 'apps zilizopatikana',
     pulseTitle: 'Redio ya Tumone',
     pulseDescription: 'Tazama kinachopanda katika maeneo, vifaa na waumbaji. Tumone Radar inaongoza kasi kabla haijaanguka.',
-    downloadGuideTitle: 'Download guide',
+    downloadGuideTitle: 'Mwongozo wa kusakinisha',
     downloadGuideSubtitle: 'Interactive phone frames for each platform showing how to install our verified apps.',
     guideNext: 'Suivant',
     guideRepeat: 'Recommencer',
@@ -625,7 +626,8 @@ export default function App() {
   const [platform, setPlatform] = useState<'ios' | 'android' | 'pwa'>('pwa');
   const [installStatus, setInstallStatus] = useState<'idle' | 'scanning' | 'downloading' | 'completed'>('idle');
   const [installProgress, setInstallProgress] = useState(0);
-  const [installHelpApp, setInstallHelpApp] = useState<AppData | null>(null);
+  const [redirectApp, setRedirectApp] = useState<AppData | null>(null);
+  const [redirectProgress, setRedirectProgress] = useState(0);
   const [footerPage, setFooterPage] = useState<FooterPageId | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [downloadingApps, setDownloadingApps] = useState<Set<string>>(new Set());
@@ -783,72 +785,48 @@ export default function App() {
   };
 
   const getAppWebUrl = (app: AppData) => app.pwaUrl || app.iosUrl || '';
-  const installHelpSteps = platform === 'ios'
-    ? [
-      'Dans Safari, touchez le bouton Partager.',
-      'Choisissez “Ajouter à l’écran d’accueil”.',
-      'Validez le nom, puis revenez dans Tumone Store.',
-    ]
-    : platform === 'android'
-      ? [
-        'Dans Chrome, ouvrez le menu en haut à droite.',
-        'Touchez “Installer l’app” ou “Ajouter à l’écran d’accueil”.',
-        'Confirmez l’installation, puis revenez dans Tumone Store.',
-      ]
-      : [
-        'Dans la barre d’adresse, cliquez sur l’icône d’installation si elle apparaît.',
-        'Sinon, ouvrez le menu du navigateur puis choisissez “Installer”.',
-        'Confirmez, puis revenez dans Tumone Store.',
-      ];
 
-  const openAppWebVersion = (app: AppData) => {
-    const webUrl = getAppWebUrl(app);
-    if (!webUrl) return null;
+  useEffect(() => {
+    if (!redirectApp) return;
 
-    setInstallHelpApp(app);
-    const openedWindow = window.open(webUrl, '_blank', 'noopener,noreferrer');
-    if (!openedWindow) {
-      window.location.href = webUrl;
-    }
+    const startedAt = Date.now();
+    setRedirectProgress(0);
 
-    return openedWindow;
-  };
+    const interval = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      setRedirectProgress(Math.min(100, Math.round((elapsed / REDIRECT_DELAY_MS) * 100)));
+    }, 80);
 
-  const handleModalDownload = async (app: AppData) => {
+    const timeout = window.setTimeout(() => {
+      const webUrl = getAppWebUrl(redirectApp);
+      if (webUrl) {
+        window.location.href = webUrl;
+      }
+    }, REDIRECT_DELAY_MS);
+
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
+  }, [redirectApp]);
+
+  const prepareInstallRedirect = (app: AppData) => {
     if (!getAppWebUrl(app)) return;
 
-    setInstallStatus('scanning');
-    setInstallProgress(0);
-
-    openAppWebVersion(app);
-
-    await new Promise(resolve => setTimeout(resolve, 350));
-
+    setSelectedApp(null);
+    setRedirectApp(app);
     setInstallStatus('downloading');
-    for (let i = 25; i <= 100; i += 25) {
-      setInstallProgress(i);
-      await new Promise(resolve => setTimeout(resolve, 80));
-    }
-
-    setInstallStatus('completed');
-  };
-
-  const handleDownload = async (app: AppData) => {
-    if (!getAppWebUrl(app)) return;
-
+    setInstallProgress(0);
     setDownloadingApps(prev => new Set(prev).add(app.id));
-
-    try {
-      openAppWebVersion(app);
-      await new Promise(resolve => setTimeout(resolve, 650));
-    } finally {
-      setDownloadingApps(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(app.id);
-        return newSet;
-      });
-    }
   };
+
+  useEffect(() => {
+    setInstallProgress(redirectProgress);
+  }, [redirectProgress]);
+
+  const handleModalDownload = (app: AppData) => prepareInstallRedirect(app);
+
+  const handleDownload = (app: AppData) => prepareInstallRedirect(app);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
@@ -891,8 +869,8 @@ export default function App() {
 
       {/* Navigation */}
       <nav className="sticky top-0 z-40 glass-dark border-b border-white/5 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-3 sm:flex-nowrap sm:justify-between">
+          <div className="flex shrink-0 items-center gap-2">
             <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-500/20 bg-white/5 border border-white/10 yellow-glow">
               <img src="/logo.png" alt="Tumone Store" className="w-full h-full object-cover" />
             </div>
@@ -901,18 +879,18 @@ export default function App() {
             </h1>
           </div>
 
-          <div className="relative flex-1 max-w-md mx-8">
+          <div className="relative order-3 w-full flex-none sm:order-none sm:mx-8 sm:max-w-md sm:flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
             <input
               type="text"
               placeholder={copy.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
+              className="h-11 w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-base sm:text-sm"
             />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-4">
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[color:var(--accent-yellow)]/10 border border-[color:var(--accent-yellow)]/20 text-[color:var(--accent-yellow)] text-xs font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
               Tumone Verified
@@ -932,12 +910,12 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <div className="flex sm:hidden items-center gap-2">
+            <div className="flex sm:hidden items-center gap-1">
               {LANGUAGE_OPTIONS.map((code) => (
                 <button
                   key={`mobile-${code}`}
                   onClick={() => setLanguage(code)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full text-[10px] font-semibold border ${
+                  className={`w-7 h-7 flex items-center justify-center rounded-full text-[9px] font-semibold border ${
                     language === code
                       ? 'bg-white text-black border-white'
                       : 'bg-white/5 text-white/60 border-white/20'
@@ -947,7 +925,7 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+            <div className="hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 sm:flex items-center justify-center">
               <Smartphone className="w-5 h-5 text-white/60" />
             </div>
           </div>
@@ -1043,7 +1021,7 @@ export default function App() {
         {shouldShowGuide && (
           <section className="mb-12">
             <div className="flex flex-col items-center text-center gap-3 max-w-3xl mx-auto">
-              <p className="text-[10px] uppercase tracking-[0.6em] text-white/40">Tumone Download</p>
+              <p className="text-[10px] uppercase tracking-[0.6em] text-white/40">Tumone Install</p>
               <h3 className="text-3xl font-display font-bold">{copy.downloadGuideTitle}</h3>
             <p className="text-white/60 text-sm sm:text-base">{copy.downloadGuideSubtitle}</p>
           </div>
@@ -1132,7 +1110,7 @@ export default function App() {
                         e.stopPropagation();
                         handleDownload(app);
                       }}
-                      aria-label={`Ouvrir la version web de ${app.name}`}
+                      aria-label={`Installer ${app.name}`}
                       disabled={downloadingApps.has(app.id)}
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition-all sm:h-9 sm:w-9 ${
                         downloadingApps.has(app.id)
@@ -1149,7 +1127,7 @@ export default function App() {
                           <Download className="w-full h-full" />
                         </motion.div>
                       ) : (
-                        <Globe className="w-3.5 h-3.5" />
+                        <Download className="w-3.5 h-3.5" />
                       )}
                     </button>
                   </div>
@@ -1277,7 +1255,7 @@ export default function App() {
                         {installStatus === 'idle' && (
                           <>
                             <Download className="w-5 h-5" />
-                            Ouvrir la version web
+                            Installer
                           </>
                         )}
                         {installStatus === 'scanning' && (
@@ -1294,7 +1272,7 @@ export default function App() {
                         {installStatus === 'downloading' && (
                           <div className="flex flex-col items-center w-full px-4">
                             <div className="flex justify-between w-full mb-1 text-xs">
-                              <span>Ouverture web...</span>
+                              <span>Préparation...</span>
                               <span>{installProgress}%</span>
                             </div>
                             <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -1432,8 +1410,8 @@ export default function App() {
                             </motion.div>
                           ) : (
                             <>
-                              <Globe className="w-3.5 h-3.5" />
-                              Web
+                              <Download className="w-3.5 h-3.5" />
+                              Installer
                             </>
                           )}
                         </button>
@@ -1447,74 +1425,75 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* PWA Install Helper */}
+      {/* Install Redirect Assistant */}
       <AnimatePresence>
-        {installHelpApp && (
-          <div className="fixed inset-0 z-[55] flex items-end justify-center p-4 sm:items-center sm:p-6">
+        {redirectApp && (
+          <div className="fixed inset-0 z-[70] flex items-center justify-center overflow-hidden bg-[#050505] p-5">
             <motion.div
+              className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(247,199,28,0.18),transparent_28%),radial-gradient(circle_at_72%_68%,rgba(16,185,129,0.15),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.04),transparent_40%)]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setInstallHelpApp(null)}
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             />
+            <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.16)_1px,transparent_1px)] [background-size:64px_64px]" />
+
             <motion.div
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 28, scale: 0.98 }}
-              className="relative w-full max-w-lg rounded-[32px] border border-white/10 bg-[#080808]/95 p-6 shadow-2xl backdrop-blur-2xl"
+              exit={{ opacity: 0, y: 24, scale: 0.96 }}
+              className="relative w-full max-w-xl overflow-hidden rounded-[36px] border border-white/10 bg-black/55 p-6 shadow-[0_34px_120px_rgba(0,0,0,0.65)] backdrop-blur-2xl sm:p-8"
             >
-              <button
-                onClick={() => setInstallHelpApp(null)}
-                className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--accent-yellow)]/70 to-transparent" />
+              <div className="flex flex-col items-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.42em] text-[color:var(--accent-yellow)]">
+                  Tumone Install
+                </p>
 
-              <div className="flex items-center gap-4 pr-12">
-                <img
-                  src={installHelpApp.icon}
-                  alt={installHelpApp.name}
-                  className="h-14 w-14 rounded-2xl border border-white/10 object-cover"
-                />
-                <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-[0.28em] text-[color:var(--accent-yellow)]">Installation PWA</p>
-                  <h3 className="mt-1 truncate text-2xl font-display font-bold">{installHelpApp.name}</h3>
-                </div>
-              </div>
-
-              <p className="mt-5 text-sm leading-relaxed text-white/62">
-                La PWA est ouverte dans un nouvel onglet. Pour l’ajouter à l’écran d’accueil, confirmez l’installation dans votre navigateur.
-              </p>
-
-              <div className="mt-5 space-y-3">
-                {installHelpSteps.map((step, index) => (
-                  <div key={step} className="flex gap-3 rounded-2xl border border-white/8 bg-white/[0.045] p-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent-yellow)] text-xs font-bold text-black">
-                      {index + 1}
-                    </span>
-                    <p className="text-sm leading-snug text-white/75">{step}</p>
+                <div className="relative mt-8 flex h-36 w-64 items-center justify-center">
+                  <motion.div
+                    className="absolute inset-0 rounded-full border border-white/10"
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 16, ease: "linear" }}
+                  />
+                  <motion.div
+                    className="absolute h-24 w-24 rounded-full border border-[color:var(--accent-yellow)]/30"
+                    animate={{ rotate: -360 }}
+                    transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
+                  />
+                  <div className="absolute left-8 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[24px] border border-white/10 bg-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+                    <img src="/logo.png" alt="Tumone Store" className="h-full w-full object-cover" />
                   </div>
-                ))}
-              </div>
+                  <ChevronRight className="h-7 w-7 text-white/45" />
+                  <div className="absolute right-8 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[24px] border border-[color:var(--accent-yellow)]/25 bg-white/5 shadow-[0_20px_60px_rgba(247,199,28,0.18)]">
+                    <img src={redirectApp.icon} alt={redirectApp.name} className="h-full w-full object-cover" />
+                  </div>
+                </div>
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button
-                  onClick={() => openAppWebVersion(installHelpApp)}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-black transition hover:bg-[color:var(--accent-yellow)]"
-                >
-                  <Globe className="h-4 w-4" />
-                  Ouvrir la PWA
-                </button>
-                <button
-                  onClick={() => {
-                    setInstallHelpApp(null);
-                    setInstallStatus('idle');
-                  }}
-                  className="flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white/80 transition hover:bg-white/10"
-                >
-                  Retour au Store
-                </button>
+                <h2 className="mt-4 text-3xl font-display font-bold sm:text-4xl">
+                  Préparation de {redirectApp.name}
+                </h2>
+                <p className="mt-4 max-w-md text-sm leading-relaxed text-white/62 sm:text-base">
+                  Vous allez être redirigé dans l’app pendant que nous préparons votre expérience.
+                </p>
+
+                <div className="mt-8 w-full rounded-[24px] border border-white/10 bg-white/[0.045] p-4">
+                  <div className="mb-3 flex items-center justify-between text-xs text-white/50">
+                    <span>Connexion sécurisée</span>
+                    <span>{redirectProgress}%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-[color:var(--accent-yellow)] to-emerald-300"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${redirectProgress}%` }}
+                      transition={{ duration: 0.12 }}
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-5 text-xs text-white/38">
+                  Ne fermez pas cette fenêtre. Redirection automatique en quelques secondes.
+                </p>
               </div>
             </motion.div>
           </div>

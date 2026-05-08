@@ -31,8 +31,8 @@ export const APPS: AppData[] = [
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646669/tumone-store/apps/ekonzo/Ekonzo._Screen_3.png',
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773646673/tumone-store/apps/ekonzo/Ekonzo._Screen_4.png',
     ],
-    pwaUrl: 'https://ekonzo.groupetumone-sarlu.com',
-    iosUrl: 'https://ekonzo.groupetumone-sarlu.com',
+    pwaUrl: 'https://ekonzoapp.gtsarlu.com/',
+    iosUrl: 'https://ekonzoapp.gtsarlu.com/',
     isVerified: true,
   },
   {
@@ -52,8 +52,8 @@ export const APPS: AppData[] = [
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773611933/tumone-store/apps/ChooseMe/Choo._Screen04.png',
       'https://res.cloudinary.com/dy73hzkpm/image/upload/v1773611934/tumone-store/apps/ChooseMe/Choo._Screen05.png',
     ],
-    pwaUrl: 'https://app.choose-me.net/',
-    iosUrl: 'https://app.choose-me.net/',
+    pwaUrl: 'https://choosemeapp.gtsarlu.com/',
+    iosUrl: 'https://choosemeapp.gtsarlu.com/',
     isVerified: true,
   },
   {
